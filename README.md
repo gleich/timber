@@ -10,6 +10,8 @@
 </div>
 <hr>
 
+_The original package is [github.com/lumber](https://github.com/gleich/lumber)._
+
 - [Install](#-install)
 - [Logging Functions](#-logging-functions)
   - [`timber.Done()`](#timberDone)
