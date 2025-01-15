@@ -4,19 +4,19 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/gleich/lumber/v3"
+	"pkg.mattglei.ch/timber"
 )
 
 func main() {
-	lumber.SetTimezone(time.Local)
-	lumber.SetTimeFormat("Mon Jan 2 15:04:05 MST 2006")
-	lumber.SetFatalExitCode(0)
+	timber.SetTimezone(time.Local)
+	timber.SetTimeFormat("Mon Jan 2 15:04:05 MST 2006")
+	timber.SetFatalExitCode(0)
 
 	randCap := 100
-	lumber.Debug(rand.Intn(randCap))
-	lumber.Info(rand.Intn(randCap))
-	lumber.Done(rand.Intn(randCap))
-	lumber.Warning(rand.Intn(randCap))
-	lumber.ErrorMsg(rand.Intn(randCap))
-	lumber.FatalMsg(rand.Intn(randCap))
+	timber.Debug(rand.Intn(randCap))
+	timber.Info(rand.Intn(randCap))
+	timber.Done(rand.Intn(randCap))
+	timber.Warning(rand.Intn(randCap))
+	timber.ErrorMsg(rand.Intn(randCap))
+	timber.FatalMsg(rand.Intn(randCap))
 }

@@ -5,15 +5,15 @@ import (
 	"log"
 	"time"
 
-	"github.com/gleich/lumber/v3"
+	"pkg.mattglei.ch/timber"
 )
 
 func main() {
-	lumberResult := timeFunc(lumber.Done)
+	timberResult := timeFunc(timber.Done)
 	logResult := timeFunc(log.Println)
 
 	fmt.Println()
-	fmt.Println("lumber:", lumberResult)
+	fmt.Println("timber:", timberResult)
 	fmt.Println("log:", logResult)
 }
 

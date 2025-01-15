@@ -1,13 +1,13 @@
 package main
 
-import "github.com/gleich/lumber/v3"
+import "pkg.mattglei.ch/timber"
 
 func main() {
 	msg := "Hello World!"
-	lumber.Debug(msg)
-	lumber.Done(msg)
-	lumber.Info(msg)
-	lumber.Warning(msg)
-	lumber.ErrorMsg(msg)
-	lumber.FatalMsg(msg)
+	timber.Debug(msg)
+	timber.Done(msg)
+	timber.Info(msg)
+	timber.Warning(msg)
+	timber.ErrorMsg(msg)
+	timber.FatalMsg(msg)
 }

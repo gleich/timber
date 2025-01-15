@@ -1,4 +1,4 @@
-package lumber
+package timber
 
 import (
 	"fmt"

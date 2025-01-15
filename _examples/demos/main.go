@@ -5,40 +5,40 @@ import (
 	"os"
 	"time"
 
-	"github.com/gleich/lumber/v3"
+	"pkg.mattglei.ch/timber"
 )
 
 func main() {
 	demos := []func(){
 		func() {
-			lumber.Done("Loaded up the program!")
+			timber.Done("Loaded up the program!")
 			time.Sleep(2 * time.Second)
-			lumber.Done("Waited 2 seconds")
+			timber.Done("Waited 2 seconds")
 		},
 		func() {
-			lumber.Info("Getting the current year")
+			timber.Info("Getting the current year")
 			now := time.Now()
-			lumber.Info("Current year is", now.Year())
+			timber.Info("Current year is", now.Year())
 		},
 		func() {
 			homeDir, _ := os.UserHomeDir()
-			lumber.Debug("User's home dir is", homeDir)
+			timber.Debug("User's home dir is", homeDir)
 		},
 		func() {
 			now := time.Now()
 			if now.Year() != 2004 {
-				lumber.Warning("Current year isn't 2004")
+				timber.Warning("Current year isn't 2004")
 			}
 		},
 		func() {
 			fname := "invisible-file.txt"
 			_, err := os.ReadFile(fname)
 			if err != nil {
-				lumber.Error(err, "Failed to read from", fname)
+				timber.Error(err, "Failed to read from", fname)
 			}
 		},
 		func() {
-			lumber.FatalMsg("Fatal message")
+			timber.FatalMsg("Fatal message")
 		},
 	}
 
