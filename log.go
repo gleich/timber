@@ -35,7 +35,7 @@ func format(level logLevel, color lipgloss.Style, v ...any) string {
 		"%s %s %s",
 		time.Now().In(logger.timezone).Format(logger.timeFormat),
 		color.Render(string(level)),
-		strings.TrimPrefix(joined.String(), " "),
+		joined.String(),
 	)
 }
 
