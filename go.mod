@@ -1,6 +1,6 @@
 module pkg.mattglei.ch/timber
 
-go 1.23
+go 1.23.5
 
 require (
 	github.com/charmbracelet/lipgloss v1.0.0
