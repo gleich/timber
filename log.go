@@ -2,8 +2,6 @@ package timber
 
 import (
 	"fmt"
-	"io"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -24,27 +22,23 @@ const (
 )
 
 func format(level logLevel, color lipgloss.Style, v ...any) string {
-	var joined strings.Builder
+	var b strings.Builder
+	fmt.Fprintf(&b, "%s ", time.Now().In(logger.timezone).Format(logger.timeFormat))
+	fmt.Fprintf(&b, "%s ", color.Render(string(level)))
 	for i, item := range v {
 		if i > 0 {
-			joined.WriteString(" ")
+			b.WriteString(" ")
 		}
-		fmt.Fprint(&joined, item)
+		fmt.Fprint(&b, item)
 	}
-	return fmt.Sprintf(
-		"%s %s %s",
-		time.Now().In(logger.timezone).Format(logger.timeFormat),
-		color.Render(string(level)),
-		joined.String(),
-	)
+	return b.String()
 }
 
 // Normal log output
 func logNormal(level logLevel, color lipgloss.Style, v ...any) {
 	logger.mutex.RLock()
 	defer logger.mutex.RUnlock()
-	out := format(level, color, v...)
-	log.New(io.MultiWriter(append(logger.extraNormalOuts, logger.normalOut)...), "", 0).Println(out)
+	logger.normalLogger.Println(format(level, color, v...))
 }
 
 func logError(err error, level logLevel, color lipgloss.Style, v ...any) {
@@ -57,7 +51,7 @@ func logError(err error, level logLevel, color lipgloss.Style, v ...any) {
 
 		out += fmt.Sprintf("\n%s", err)
 	}
-	log.New(io.MultiWriter(append(logger.extraErrOuts, logger.errOut)...), "", 0).Println(out)
+	logger.errLogger.Println(out)
 }
 
 // Output a INFO log message

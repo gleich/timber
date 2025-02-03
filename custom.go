@@ -2,6 +2,7 @@ package timber
 
 import (
 	"io"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -13,10 +14,12 @@ var logger loggerOptions = *defaultLogger()
 
 type loggerOptions struct {
 	mutex           *sync.RWMutex
+	normalLogger    *log.Logger
+	errLogger       *log.Logger
 	normalOut       io.Writer
 	errOut          io.Writer
-	normalRenderer  lipgloss.Renderer
-	errRenderer     lipgloss.Renderer
+	normalRenderer  *lipgloss.Renderer
+	errRenderer     *lipgloss.Renderer
 	extraNormalOuts []io.Writer
 	extraErrOuts    []io.Writer
 	fatalExitCode   int
@@ -45,12 +48,16 @@ const (
 
 // Initialize the default logger with the default values
 func defaultLogger() *loggerOptions {
+	normalOut := os.Stdout
+	errOut := os.Stderr
 	l := loggerOptions{
 		mutex:           &sync.RWMutex{},
-		normalOut:       os.Stdout,
-		errOut:          os.Stderr,
-		normalRenderer:  *lipgloss.NewRenderer(os.Stdout),
-		errRenderer:     *lipgloss.NewRenderer(os.Stderr),
+		normalLogger:    log.New(normalOut, "", 0),
+		errLogger:       log.New(errOut, "", 0),
+		normalOut:       normalOut,
+		errOut:          errOut,
+		normalRenderer:  lipgloss.NewRenderer(normalOut),
+		errRenderer:     lipgloss.NewRenderer(errOut),
 		extraNormalOuts: []io.Writer{},
 		extraErrOuts:    []io.Writer{},
 		fatalExitCode:   1,
@@ -79,14 +86,31 @@ func defaultLogger() *loggerOptions {
 	return &l
 }
 
+func updateNormalLogger() {
+	logger.normalLogger = log.New(
+		io.MultiWriter(append(logger.extraNormalOuts, logger.normalOut)...),
+		"",
+		0,
+	)
+}
+
+func updateErrLogger() {
+	logger.errLogger = log.New(
+		io.MultiWriter(append(logger.extraErrOuts, logger.errOut)...),
+		"",
+		0,
+	)
+}
+
 // Set the output or Debug, Done, Warning, and Info.
 //
 // Default is os.Stdout
-func SetNormalOut(out *os.File) {
+func SetNormalOut(out io.Writer) {
 	logger.mutex.Lock()
 	defer logger.mutex.Unlock()
 	logger.normalOut = out
-	logger.normalRenderer = *lipgloss.NewRenderer(out)
+	logger.normalRenderer = lipgloss.NewRenderer(out)
+	updateNormalLogger()
 	// rerendering colors incase new output doesn't support colors
 	logger.colors.DebugStyle = logger.normalRenderer.NewStyle().
 		Foreground(lipgloss.Color(defaultDebugColor)).
@@ -103,11 +127,12 @@ func SetNormalOut(out *os.File) {
 // Set the output or Fatal, FatalMsg, Error, and ErrorMsg.
 //
 // Default is os.Stderr
-func SetErrOut(out *os.File) {
+func SetErrOut(out io.Writer) {
 	logger.mutex.Lock()
 	defer logger.mutex.Unlock()
 	logger.errOut = out
-	logger.errRenderer = *lipgloss.NewRenderer(out)
+	logger.errRenderer = lipgloss.NewRenderer(out)
+	updateErrLogger()
 	// rerendering colors incase new output doesn't support colors
 	logger.colors.ErrorStyle = logger.errRenderer.NewStyle().
 		Foreground(lipgloss.Color(defaultErrorColor)).
@@ -134,6 +159,7 @@ func SetExtraNormalOuts(outs []io.Writer) {
 	logger.mutex.Lock()
 	defer logger.mutex.Unlock()
 	logger.extraNormalOuts = outs
+	updateNormalLogger()
 }
 
 // Set the extra normal out destinations (e.g. logging to a file)
@@ -141,6 +167,7 @@ func SetExtraErrOuts(outs []io.Writer) {
 	logger.mutex.Lock()
 	defer logger.mutex.Unlock()
 	logger.extraErrOuts = outs
+	updateErrLogger()
 }
 
 // Set the exit code used by Fatal and FatalMsg.
@@ -163,7 +190,7 @@ func SetShowStack(show bool) {
 
 // Set the time format
 //
-// Default is 2006/01/02 15:04:05 MST
+// Default is 01/02/2006 15:04:05 MST
 func SetTimeFormat(format string) {
 	logger.mutex.Lock()
 	defer logger.mutex.Unlock()
