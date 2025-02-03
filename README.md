@@ -51,9 +51,9 @@ import (
 )
 
 func main() {
-    timber.Done("booted up the program!")
+    timber.Done("loaded up the program!")
     time.Sleep(2 * time.Second)
-    timber.Done("waited 2 seconds!")
+    timber.Done("waited 2 seconds")
 }
 ```
 
@@ -77,9 +77,9 @@ import (
 )
 
 func main() {
-    timber.Info("Getting the current year")
+    timber.Info("getting the current year")
     now := time.Now()
-    timber.Info("Current year is", now.Year())
+    timber.Info("current year is", now.Year())
 }
 ```
 
@@ -104,7 +104,7 @@ import (
 
 func main() {
     homeDir, _ := os.UserHomeDir()
-    timber.Debug("User's home dir is", homeDir)
+    timber.Debug("user's home dir is", homeDir)
 }
 ```
 
@@ -130,7 +130,7 @@ import (
 func main() {
     now := time.Now()
     if now.Year() != 2004 {
-        timber.Warning("Current year isn't 2004")
+        timber.Warning("current year isn't 2004")
     }
 }
 ```
@@ -158,7 +158,7 @@ func main() {
     fname := "invisible-file.txt"
     _, err := os.ReadFile(fName)
     if err != nil {
-        timber.Error(err, "Failed to read from", fname)
+        timber.Error(err, "failed to read from", fname)
     }
 }
 ```
@@ -179,7 +179,7 @@ package main
 import "pkg.mattglei.ch/timber"
 
 func main() {
-    timber.ErrorMsg("Ahhh stuff broke")
+    timber.ErrorMsg("error message")
 }
 ```
 
@@ -206,7 +206,7 @@ func main() {
     fName := "invisible-file.txt"
     _, err := os.ReadFile(fName)
     if err != nil {
-        timber.Fatal(err, "Failed to read from", fName)
+        timber.Fatal(err, "failed to read from", fName)
     }
 }
 ```
@@ -227,7 +227,7 @@ package main
 import "pkg.mattglei.ch/timber"
 
 func main() {
-    timber.FatalMsg("Ahhh stuff broke")
+    timber.FatalMsg("fatal message")
 }
 ```
 
@@ -253,7 +253,7 @@ func main() {
     timber.SetTimeFormat("Mon Jan 2 15:04:05 MST 2006")
     timber.SetFatalExitCode(0)
 
-    timber.Done("Calling from custom logger")
+    timber.Done("calling from custom logger")
 }
 ```
 
