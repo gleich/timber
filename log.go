@@ -3,11 +3,11 @@ package timber
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strings"
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pkg/errors"
 )
 
 type logLevel string
@@ -38,7 +38,7 @@ func format(level logLevel, color lipgloss.Style, v ...any) string {
 func logNormal(level logLevel, color lipgloss.Style, v ...any) {
 	logger.mutex.RLock()
 	defer logger.mutex.RUnlock()
-	logger.normalLogger.Println(format(level, color, v...))
+	logger.normalLogger.Print(format(level, color, v...))
 }
 
 func logError(err error, level logLevel, color lipgloss.Style, v ...any) {
@@ -46,12 +46,11 @@ func logError(err error, level logLevel, color lipgloss.Style, v ...any) {
 	defer logger.mutex.RUnlock()
 	out := format(level, color, v...)
 	if err != nil && logger.showStack {
-		out += fmt.Sprintf("\n%+v", errors.WithStack(err))
+		out += fmt.Sprintf("\n%s\n%s", err, string(debug.Stack()))
 	} else if err != nil {
-
 		out += fmt.Sprintf("\n%s", err)
 	}
-	logger.errLogger.Println(out)
+	logger.errLogger.Print(out)
 }
 
 // Output a INFO log message

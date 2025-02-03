@@ -2,10 +2,7 @@ module pkg.mattglei.ch/timber
 
 go 1.23.5
 
-require (
-	github.com/charmbracelet/lipgloss v1.0.0
-	github.com/pkg/errors v0.9.1
-)
+require github.com/charmbracelet/lipgloss v1.0.0
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
