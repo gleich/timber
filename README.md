@@ -2,6 +2,7 @@
     <h1>timber</h1>
     <a href="https://pkg.go.dev/pkg.mattglei.ch/timber"><img alt="Godoc Reference" src="https://pkg.go.dev/badge/pkg.mattglei.ch/timber?utm_source=godoc"></a>
     <img alt="lint workflow result" src="https://github.com/gleich/timber/actions/workflows/lint.yml/badge.svg">
+    <img alt="test workflow result" src="https://github.com/gleich/timber/actions/workflows/test.yml/badge.svg">
     <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/gleich/timber">
     <img alt="Golang report card" src ="https://goreportcard.com/badge/pkg.mattglei.ch/timber">
     <br>
