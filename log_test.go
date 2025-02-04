@@ -15,13 +15,13 @@ func TestFormat(t *testing.T) {
 	logger.timezone = time.UTC
 	logger.timeFormat = "2006-01-02 15:04:05"
 
-	style := lipgloss.NewStyle()
-
-	level := logLevel("INFO")
-	msg1 := "hello"
-	msg2 := "world"
-
-	output := format(level, style, msg1, msg2)
+	var (
+		style  = lipgloss.NewStyle()
+		level  = logLevel("INFO")
+		msg1   = "hello"
+		msg2   = "world"
+		output = format(level, style, msg1, msg2)
+	)
 
 	if len(output) < 20 {
 		t.Fatalf("output too short: %q", output)
