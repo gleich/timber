@@ -64,7 +64,7 @@ Outputs:
 
 ### [`timber.Info()`](https://pkg.go.dev/pkg.mattglei.ch/timber#Info)
 
-Output an info log.
+Output a info log.
 
 Demo:
 
