@@ -1,10 +1,10 @@
 <div align="center">
     <h1>timber</h1>
-    <a href="https://pkg.go.dev/pkg.mattglei.ch/timber"><img alt="Godoc Reference" src="https://pkg.go.dev/badge/pkg.mattglei.ch/timber?utm_source=godoc"></a>
+    <a href="https://pkg.go.dev/go.mattglei.ch/timber"><img alt="Godoc Reference" src="https://pkg.go.dev/badge/go.mattglei.ch/timber?utm_source=godoc"></a>
     <img alt="lint workflow result" src="https://github.com/gleich/timber/actions/workflows/lint.yml/badge.svg">
     <img alt="test workflow result" src="https://github.com/gleich/timber/actions/workflows/test.yml/badge.svg">
     <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/gleich/timber">
-    <img alt="Golang report card" src ="https://goreportcard.com/badge/pkg.mattglei.ch/timber">
+    <img alt="Golang report card" src ="https://goreportcard.com/badge/go.mattglei.ch/timber">
     <br>
     <i>Easy to use & pretty logger for golang</i>
     <br>
@@ -31,12 +31,12 @@ _The original package is [github.com/gleich/lumber](https://github.com/gleich/lu
 Simply run the following from your project root:
 
 ```bash
-go get -u pkg.mattglei.ch/timber
+go get -u go.mattglei.ch/timber
 ```
 
 ## Logging Functions
 
-### [`timber.Done()`](https://pkg.go.dev/pkg.mattglei.ch/timber#Done)
+### [`timber.Done()`](https://pkg.go.dev/go.mattglei.ch/timber#Done)
 
 Output a "DONE" log.
 
@@ -48,7 +48,7 @@ package main
 import (
     "time"
 
-    "pkg.mattglei.ch/timber"
+    "go.mattglei.ch/timber"
 )
 
 func main() {
@@ -62,7 +62,7 @@ Outputs:
 
 ![Done output](images/done.png)
 
-### [`timber.Info()`](https://pkg.go.dev/pkg.mattglei.ch/timber#Info)
+### [`timber.Info()`](https://pkg.go.dev/go.mattglei.ch/timber#Info)
 
 Output a info log.
 
@@ -74,7 +74,7 @@ package main
 import (
     "time"
 
-    "pkg.mattglei.ch/timber"
+    "go.mattglei.ch/timber"
 )
 
 func main() {
@@ -88,7 +88,7 @@ Outputs:
 
 ![info output](images/info.png)
 
-### [`timber.Debug()`](https://pkg.go.dev/pkg.mattglei.ch/timber#Debug)
+### [`timber.Debug()`](https://pkg.go.dev/go.mattglei.ch/timber#Debug)
 
 Output a debug log.
 
@@ -100,7 +100,7 @@ package main
 import (
     "os"
 
-    "pkg.mattglei.ch/timber"
+    "go.mattglei.ch/timber"
 )
 
 func main() {
@@ -113,7 +113,7 @@ Outputs:
 
 ![debug output](images/debug.png)
 
-### [`timber.Warning()`](https://pkg.go.dev/pkg.mattglei.ch/timber#Warning)
+### [`timber.Warning()`](https://pkg.go.dev/go.mattglei.ch/timber#Warning)
 
 Output a warning log.
 
@@ -125,7 +125,7 @@ package main
 import (
     "time"
 
-    "pkg.mattglei.ch/timber"
+    "go.mattglei.ch/timber"
 )
 
 func main() {
@@ -140,7 +140,7 @@ Outputs:
 
 ![warning output](images/warning.png)
 
-### [`timber.Error()`](https://pkg.go.dev/pkg.mattglei.ch/timber#Error)
+### [`timber.Error()`](https://pkg.go.dev/go.mattglei.ch/timber#Error)
 
 Output an error log with a stack trace.
 
@@ -152,7 +152,7 @@ package main
 import (
     "os"
 
-    "pkg.mattglei.ch/timber"
+    "go.mattglei.ch/timber"
 )
 
 func main() {
@@ -168,7 +168,7 @@ Outputs:
 
 ![error output](images/error.png)
 
-### [`timber.ErrorMsg()`](https://pkg.go.dev/pkg.mattglei.ch/timber#ErrorMsg)
+### [`timber.ErrorMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#ErrorMsg)
 
 Output an error message.
 
@@ -177,7 +177,7 @@ Demo:
 ```go
 package main
 
-import "pkg.mattglei.ch/timber"
+import "go.mattglei.ch/timber"
 
 func main() {
     timber.ErrorMsg("error message")
@@ -188,7 +188,7 @@ Outputs:
 
 ![errorMsg output](images/errorMsg.png)
 
-### [`timber.Fatal()`](https://pkg.go.dev/pkg.mattglei.ch/timber#Fatal)
+### [`timber.Fatal()`](https://pkg.go.dev/go.mattglei.ch/timber#Fatal)
 
 Output a fatal log with a stack trace.
 
@@ -200,7 +200,7 @@ package main
 import (
     "os"
 
-    "pkg.mattglei.ch/timber"
+    "go.mattglei.ch/timber"
 )
 
 func main() {
@@ -216,7 +216,7 @@ Outputs:
 
 ![fatal output](images/fatal.png)
 
-### [`timber.FatalMsg()`](https://pkg.go.dev/pkg.mattglei.ch/timber#FatalMsg)
+### [`timber.FatalMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#FatalMsg)
 
 Output a fatal message.
 
@@ -225,7 +225,7 @@ Demo:
 ```go
 package main
 
-import "pkg.mattglei.ch/timber"
+import "go.mattglei.ch/timber"
 
 func main() {
     timber.FatalMsg("fatal message")
@@ -246,7 +246,7 @@ package main
 import (
     "time"
 
-    "pkg.mattglei.ch/timber"
+    "go.mattglei.ch/timber"
 )
 
 func main() {

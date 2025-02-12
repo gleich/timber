@@ -1,4 +1,4 @@
-module pkg.mattglei.ch/timber
+module go.mattglei.ch/timber
 
 go 1.23.5
 
