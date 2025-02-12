@@ -1,6 +1,6 @@
 package main
 
-import "pkg.mattglei.ch/timber"
+import "go.mattglei.ch/timber"
 
 func main() {
 	msg := "Hello World!"

@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"pkg.mattglei.ch/timber"
+	"go.mattglei.ch/timber"
 )
 
 func main() {
