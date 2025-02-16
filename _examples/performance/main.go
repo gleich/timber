@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	timberResult := timeFunc(timber.Done)
 	logResult := timeFunc(log.Println)
+	timberResult := timeFunc(timber.Done)
 
 	fmt.Println()
 	fmt.Println("timber:", timberResult)
@@ -19,7 +19,7 @@ func main() {
 
 func timeFunc(f func(v ...any)) string {
 	start := time.Now()
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 100_000; i++ {
 		f("foo", "bar")
 	}
 	return time.Since(start).String()

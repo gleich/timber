@@ -6,91 +6,95 @@ import (
 	"runtime/debug"
 	"strings"
 	"time"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
-type logLevel string
-
-const (
-	debugLevel   logLevel = "DEBUG"
-	doneLevel    logLevel = "DONE "
-	infoLevel    logLevel = "INFO "
-	warningLevel logLevel = "WARN "
-	errorLevel   logLevel = "ERROR"
-	fatalLevel   logLevel = "FATAL"
-)
-
-func format(level logLevel, color lipgloss.Style, v ...any) string {
-	var b strings.Builder
-	fmt.Fprintf(&b, "%s ", time.Now().In(logger.timezone).Format(logger.timeFormat))
-	fmt.Fprintf(&b, "%s ", color.Render(string(level)))
+func format(level Level, v ...any) *strings.Builder {
+	var out strings.Builder
+	out.WriteString(time.Now().In(globalLogger.timezone).Format(globalLogger.timeFormat))
+	out.WriteRune(' ')
+	out.WriteString(level.renderedMsg)
+	out.WriteRune(' ')
 	for i, item := range v {
 		if i > 0 {
-			b.WriteString(" ")
+			out.WriteRune(' ')
 		}
-		fmt.Fprint(&b, item)
+		out.WriteString(fmt.Sprint(item))
 	}
-	return b.String()
+	return &out
 }
 
-// Normal log output
-func logNormal(level logLevel, color lipgloss.Style, v ...any) {
-	logger.mutex.RLock()
-	defer logger.mutex.RUnlock()
-	logger.normalLogger.Print(format(level, color, v...))
+func logNormal(level Level, v ...any) {
+	globalLogger.logger.Print(format(level, v...).String())
 }
 
-func logError(err error, level logLevel, color lipgloss.Style, v ...any) {
-	logger.mutex.RLock()
-	defer logger.mutex.RUnlock()
-	out := format(level, color, v...)
-	if err != nil && logger.showStack {
-		out += fmt.Sprintf("\n%s\n%s", err, string(debug.Stack()))
+func logError(err error, level Level, v ...any) {
+	out := format(level, v...)
+	if err != nil && globalLogger.showStack {
+		out.WriteRune('\n')
+		out.WriteString(err.Error())
+		out.WriteRune('\n')
+		out.WriteString(string(debug.Stack()))
 	} else if err != nil {
-		out += fmt.Sprintf("\n%s", err)
+		out.WriteRune('\n')
+		out.WriteString(err.Error())
 	}
-	logger.errLogger.Print(out)
+	globalLogger.errLogger.Print(out.String())
 }
 
-// Output a INFO log message
+// Output a DEBUG log message
 func Debug(v ...any) {
-	logNormal(debugLevel, logger.colors.DebugStyle, v...)
+	globalLogger.mutex.RLock()
+	defer globalLogger.mutex.RUnlock()
+	logNormal(globalLogger.levels.Debug, v...)
 }
 
 // Output a DONE log message
 func Done(v ...any) {
-	logNormal(doneLevel, logger.colors.DoneStyle, v...)
+	globalLogger.mutex.RLock()
+	defer globalLogger.mutex.RUnlock()
+	logNormal(globalLogger.levels.Done, v...)
 }
 
 // Output a INFO log message
 func Info(v ...any) {
-	logNormal(infoLevel, logger.colors.InfoStyle, v...)
+	globalLogger.mutex.RLock()
+	defer globalLogger.mutex.RUnlock()
+	logNormal(globalLogger.levels.Info, v...)
 }
 
 // Output a WARN log message
 func Warning(v ...any) {
-	logNormal(warningLevel, logger.colors.WarningStyle, v...)
+	globalLogger.mutex.RLock()
+	defer globalLogger.mutex.RUnlock()
+	logNormal(globalLogger.levels.Warning, v...)
 }
 
 // Output a ERROR log message with information about the error
 func Error(err error, v ...any) {
-	logError(err, errorLevel, logger.colors.ErrorStyle, v...)
+	globalLogger.mutex.RLock()
+	defer globalLogger.mutex.RUnlock()
+	logError(err, globalLogger.levels.Error, v...)
 }
 
 // Output a ERROR log message
 func ErrorMsg(v ...any) {
-	logError(nil, errorLevel, logger.colors.ErrorStyle, v...)
+	globalLogger.mutex.RLock()
+	defer globalLogger.mutex.RUnlock()
+	logError(nil, globalLogger.levels.Error, v...)
 }
 
 // Output a FATAL log message with information about the error
 func Fatal(err error, v ...any) {
-	logError(err, fatalLevel, logger.colors.FatalStyle, v...)
-	os.Exit(logger.fatalExitCode)
+	globalLogger.mutex.RLock()
+	logError(err, globalLogger.levels.Fatal, v...)
+	globalLogger.mutex.RUnlock()
+	os.Exit(globalLogger.fatalExitCode)
 }
 
 // Output a FATAL log message
 func FatalMsg(v ...any) {
-	logError(nil, fatalLevel, logger.colors.FatalStyle, v...)
-	os.Exit(logger.fatalExitCode)
+	globalLogger.mutex.RLock()
+	logError(nil, globalLogger.levels.Fatal, v...)
+	globalLogger.mutex.RUnlock()
+	os.Exit(globalLogger.fatalExitCode)
 }

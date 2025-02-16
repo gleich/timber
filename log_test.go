@@ -1,44 +1,51 @@
 package timber
 
 import (
-	"regexp"
+	"strings"
 	"testing"
 	"time"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
-// TestFormat verifies that the format function produces an output string that
-// begins with a timestamp in the expected format, followed by the rendered log level
-// and then the concatenated log message.
 func TestFormat(t *testing.T) {
-	logger.timezone = time.UTC
-	logger.timeFormat = "2006-01-02 15:04:05"
+	// Use a fixed time format (ISO 8601) without spaces to simplify parsing.
+	const layout = "2006-01-02T15:04:05Z07:00"
 
-	var (
-		style  = lipgloss.NewStyle()
-		level  = logLevel("INFO")
-		msg1   = "hello"
-		msg2   = "world"
-		output = format(level, style, msg1, msg2)
-	)
+	// Update the global logger's time configuration.
+	globalLogger.mutex.Lock()
+	globalLogger.timeFormat = layout
+	globalLogger.timezone = time.UTC
+	globalLogger.mutex.Unlock()
 
-	if len(output) < 20 {
-		t.Fatalf("output too short: %q", output)
+	level := Level{
+		renderedMsg: "TEST",
 	}
-	timestampPart := output[:19]
-	if _, err := time.Parse("2006-01-02 15:04:05", timestampPart); err != nil {
-		t.Errorf("timestamp %q is not in expected format: %v", timestampPart, err)
+	args := []any{"hello", "world"}
+	output := format(level, args...)
+
+	// Expected format: "<timestamp> <renderedMsg> <arguments joined by a space>"
+	// Split the output into three parts:
+	// 1. The timestamp string.
+	// 2. The log level rendered message.
+	// 3. The remaining message (joined arguments).
+	parts := strings.SplitN(output.String(), " ", 3)
+	if len(parts) != 3 {
+		t.Fatalf("expected output to have 3 parts, got %d: %q", len(parts), output)
 	}
 
-	expectedSuffix := "INFO hello world"
-	re := regexp.MustCompile(`^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} INFO hello world$`)
-	if !re.MatchString(output) {
-		t.Errorf("output %q does not match expected format", output)
+	// Validate the timestamp by parsing it using the same layout.
+	timestampStr := parts[0]
+	if _, err := time.Parse(layout, timestampStr); err != nil {
+		t.Errorf("timestamp %q is not valid: %v", timestampStr, err)
 	}
 
-	actualSuffix := output[20:] // skip the 19-char timestamp and the following space
-	if actualSuffix != expectedSuffix {
-		t.Errorf("expected message %q, got %q", expectedSuffix, actualSuffix)
+	// Validate that the log level rendered message is as expected.
+	if parts[1] != "TEST" {
+		t.Errorf("expected log level to be %q, got %q", "TEST", parts[1])
+	}
+
+	// Validate the message part (arguments).
+	expectedMsg := "hello world"
+	if parts[2] != expectedMsg {
+		t.Errorf("expected message to be %q, got %q", expectedMsg, parts[2])
 	}
 }

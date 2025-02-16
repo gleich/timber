@@ -10,198 +10,167 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var logger loggerOptions = *defaultLogger()
+var globalLogger *loggerOptions
 
 type loggerOptions struct {
-	mutex           *sync.RWMutex
-	normalLogger    *log.Logger
-	errLogger       *log.Logger
-	normalOut       io.Writer
-	errOut          io.Writer
-	normalRenderer  *lipgloss.Renderer
-	errRenderer     *lipgloss.Renderer
-	extraNormalOuts []io.Writer
-	extraErrOuts    []io.Writer
-	fatalExitCode   int
-	showStack       bool
-	timeFormat      string
-	timezone        *time.Location
-	colors          Colors
+	mutex         sync.RWMutex
+	out           io.Writer
+	logger        *log.Logger
+	errOut        io.Writer
+	errLogger     *log.Logger
+	renderer      *lipgloss.Renderer
+	errRenderer   *lipgloss.Renderer
+	extraOuts     []io.Writer
+	extraErrOuts  []io.Writer
+	fatalExitCode int
+	showStack     bool
+	timeFormat    string
+	timezone      *time.Location
+	levels        Levels
 }
 
-type Colors struct {
-	DebugStyle   lipgloss.Style
-	InfoStyle    lipgloss.Style
-	DoneStyle    lipgloss.Style
-	WarningStyle lipgloss.Style
-	ErrorStyle   lipgloss.Style
-	FatalStyle   lipgloss.Style
-}
-
-const (
-	defaultDebugColor = "#2B95FF"
-	defaultDoneColor  = "#30CE75"
-	defaultWarnColor  = "#E1DC3F"
-	defaultFatalColor = "#FF4747"
-	defaultErrorColor = "#FF4747"
-)
-
-// Initialize the default logger with the default values
-func defaultLogger() *loggerOptions {
-	normalOut := os.Stdout
-	errOut := os.Stderr
-	l := loggerOptions{
-		mutex:           &sync.RWMutex{},
-		normalLogger:    log.New(normalOut, "", 0),
-		errLogger:       log.New(errOut, "", 0),
-		normalOut:       normalOut,
-		errOut:          errOut,
-		normalRenderer:  lipgloss.NewRenderer(normalOut),
-		errRenderer:     lipgloss.NewRenderer(errOut),
-		extraNormalOuts: []io.Writer{},
-		extraErrOuts:    []io.Writer{},
-		fatalExitCode:   1,
-		showStack:       true,
-		timeFormat:      "01/02/2006 15:04:05 MST",
-		timezone:        time.UTC,
-	}
-	l.colors = Colors{
-		DebugStyle: l.normalRenderer.NewStyle().
-			Foreground(lipgloss.Color(defaultDebugColor)).
-			Bold(true),
-		InfoStyle: l.normalRenderer.NewStyle().Bold(true),
-		WarningStyle: l.normalRenderer.NewStyle().
-			Foreground(lipgloss.Color(defaultWarnColor)).
-			Bold(true),
-		DoneStyle: l.normalRenderer.NewStyle().
-			Foreground(lipgloss.Color(defaultDoneColor)).
-			Bold(true),
-		FatalStyle: l.errRenderer.NewStyle().
-			Foreground(lipgloss.Color(defaultFatalColor)).
-			Bold(true),
-		ErrorStyle: l.errRenderer.NewStyle().
-			Foreground(lipgloss.Color(defaultErrorColor)).
-			Bold(true),
-	}
-	return &l
+func init() {
+	var (
+		out         = os.Stdout
+		errOut      = os.Stderr
+		renderer    = lipgloss.NewRenderer(out)
+		errRenderer = lipgloss.NewRenderer(errOut)
+		bold        = renderer.NewStyle().Bold(true)
+		errBold     = errRenderer.NewStyle().Bold(true)
+		errStyle    = errRenderer.NewStyle().Inherit(errBold).
+				Foreground(lipgloss.Color("#FF4747"))
+		l = loggerOptions{
+			mutex:         sync.RWMutex{},
+			out:           out,
+			logger:        log.New(out, "", 0),
+			errOut:        errOut,
+			errLogger:     log.New(errOut, "", 0),
+			renderer:      renderer,
+			errRenderer:   errRenderer,
+			extraOuts:     []io.Writer{},
+			extraErrOuts:  []io.Writer{},
+			fatalExitCode: 1,
+			showStack:     true,
+			timeFormat:    "01/02/2006 15:04:05 MST",
+			timezone:      time.UTC,
+			levels: Levels{
+				Debug: Level{
+					Message: "DEBUG",
+					Style: renderer.NewStyle().
+						Inherit(bold).
+						Foreground(lipgloss.Color("#2B95FF")),
+				},
+				Info: Level{
+					Message: "INFO ",
+					Style:   bold,
+				},
+				Done: Level{
+					Message: "DONE ",
+					Style: renderer.NewStyle().
+						Inherit(bold).
+						Foreground(lipgloss.Color("#30CE75")),
+				},
+				Warning: Level{
+					Message: "WARN ",
+					Style: renderer.NewStyle().
+						Inherit(bold).
+						Foreground(lipgloss.Color("#E1DC3F")),
+				},
+				Error: Level{
+					Message: "ERROR",
+					Style:   errStyle,
+				},
+				Fatal: Level{
+					Message: "FATAL",
+					Style:   errStyle,
+				},
+			},
+		}
+	)
+	renderLevels(&l, true, true)
+	globalLogger = &l
 }
 
 func updateNormalLogger() {
-	logger.normalLogger = log.New(
-		io.MultiWriter(append(logger.extraNormalOuts, logger.normalOut)...),
-		"",
-		0,
-	)
+	globalLogger.out = io.MultiWriter(append(globalLogger.extraOuts, globalLogger.out)...)
 }
 
 func updateErrLogger() {
-	logger.errLogger = log.New(
-		io.MultiWriter(append(logger.extraErrOuts, logger.errOut)...),
-		"",
-		0,
-	)
+	globalLogger.errOut = io.MultiWriter(append(globalLogger.extraErrOuts, globalLogger.errOut)...)
 }
 
-// Set the output or Debug, Done, Warning, and Info.
+// Set the output for Debug, Done, Warning, and Info.
 //
 // Default is os.Stdout
-func SetNormalOut(out io.Writer) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.normalOut = out
-	logger.normalRenderer = lipgloss.NewRenderer(out)
+func Out(out io.Writer) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.out = out
+	globalLogger.renderer = lipgloss.NewRenderer(out)
 	updateNormalLogger()
-	// rerendering colors incase new output doesn't support colors
-	logger.colors.DebugStyle = logger.normalRenderer.NewStyle().
-		Foreground(lipgloss.Color(defaultDebugColor)).
-		Bold(true)
-	logger.colors.InfoStyle = logger.normalRenderer.NewStyle().Bold(true)
-	logger.colors.DoneStyle = logger.normalRenderer.NewStyle().
-		Foreground(lipgloss.Color(defaultDoneColor)).
-		Bold(true)
-	logger.colors.WarningStyle = logger.normalRenderer.NewStyle().
-		Foreground(lipgloss.Color(defaultWarnColor)).
-		Bold(true)
+	renderLevels(globalLogger, true, false)
 }
 
-// Set the output or Fatal, FatalMsg, Error, and ErrorMsg.
+// Set the output for Fatal, FatalMsg, Error, and ErrorMsg.
 //
 // Default is os.Stderr
-func SetErrOut(out io.Writer) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.errOut = out
-	logger.errRenderer = lipgloss.NewRenderer(out)
+func ErrOut(out io.Writer) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.errOut = out
+	globalLogger.errRenderer = lipgloss.NewRenderer(out)
 	updateErrLogger()
-	// rerendering colors incase new output doesn't support colors
-	logger.colors.ErrorStyle = logger.errRenderer.NewStyle().
-		Foreground(lipgloss.Color(defaultErrorColor)).
-		Bold(true)
-	logger.colors.FatalStyle = logger.errRenderer.NewStyle().
-		Foreground(lipgloss.Color(defaultFatalColor)).
-		Bold(true)
+	renderLevels(globalLogger, false, true)
 }
 
-// Set the colors used for logging
-func SetColors(colors Colors) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.colors.DebugStyle = logger.normalRenderer.NewStyle().Inherit(colors.DebugStyle)
-	logger.colors.InfoStyle = logger.normalRenderer.NewStyle().Inherit(colors.InfoStyle)
-	logger.colors.DoneStyle = logger.normalRenderer.NewStyle().Inherit(colors.DoneStyle)
-	logger.colors.WarningStyle = logger.normalRenderer.NewStyle().Inherit(colors.WarningStyle)
-	logger.colors.ErrorStyle = logger.errRenderer.NewStyle().Inherit(colors.ErrorStyle)
-	logger.colors.FatalStyle = logger.errRenderer.NewStyle().Inherit(colors.FatalStyle)
-}
-
-// Set the extra normal out destinations (e.g. logging to a file)
-func SetExtraNormalOuts(outs []io.Writer) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.extraNormalOuts = outs
+// Set the extra normal output destinations (e.g. logging to a file).
+func ExtraOuts(outs []io.Writer) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.extraOuts = outs
 	updateNormalLogger()
 }
 
-// Set the extra normal out destinations (e.g. logging to a file)
-func SetExtraErrOuts(outs []io.Writer) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.extraErrOuts = outs
+// Set the extra error output destinations (e.g. logging to a file).
+func ExtraErrOuts(outs []io.Writer) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.extraErrOuts = outs
 	updateErrLogger()
 }
 
 // Set the exit code used by Fatal and FatalMsg.
 //
 // Default is 1
-func SetFatalExitCode(code int) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.fatalExitCode = code
+func FatalExitCode(code int) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.fatalExitCode = code
 }
 
 // Set if the stack trace should be shown or not when calling Error or Fatal.
 //
 // Default is true
-func SetShowStack(show bool) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.showStack = show
+func ShowStack(show bool) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.showStack = show
 }
 
-// Set the time format
+// Set the time format that timestamps are formatted with.
 //
 // Default is 01/02/2006 15:04:05 MST
-func SetTimeFormat(format string) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.timeFormat = format
+func TimeFormat(format string) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.timeFormat = format
 }
 
-// Set the timezone
+// Set the timezone that timestamps are logged in.
 //
 // Default is time.UTC
-func SetTimezone(loc *time.Location) {
-	logger.mutex.Lock()
-	defer logger.mutex.Unlock()
-	logger.timezone = loc
+func Timezone(loc *time.Location) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.timezone = loc
 }
