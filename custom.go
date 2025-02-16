@@ -10,23 +10,23 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var globalLogger *loggerOptions
+var globalLogger *logger
 
-type loggerOptions struct {
+type logger struct {
 	mutex         sync.RWMutex
-	out           io.Writer
-	logger        *log.Logger
-	errOut        io.Writer
-	errLogger     *log.Logger
-	renderer      *lipgloss.Renderer
-	errRenderer   *lipgloss.Renderer
-	extraOuts     []io.Writer
-	extraErrOuts  []io.Writer
+	normalOutput  output
+	errOutput     output
 	fatalExitCode int
 	showStack     bool
 	timeFormat    string
 	timezone      *time.Location
 	levels        Levels
+}
+
+type output struct {
+	logger   *log.Logger
+	out      io.Writer
+	renderer *lipgloss.Renderer
 }
 
 func init() {
@@ -39,16 +39,18 @@ func init() {
 		errBold     = errRenderer.NewStyle().Bold(true)
 		errStyle    = errRenderer.NewStyle().Inherit(errBold).
 				Foreground(lipgloss.Color("#FF4747"))
-		l = loggerOptions{
-			mutex:         sync.RWMutex{},
-			out:           out,
-			logger:        log.New(out, "", 0),
-			errOut:        errOut,
-			errLogger:     log.New(errOut, "", 0),
-			renderer:      renderer,
-			errRenderer:   errRenderer,
-			extraOuts:     []io.Writer{},
-			extraErrOuts:  []io.Writer{},
+		l = logger{
+			mutex: sync.RWMutex{},
+			normalOutput: output{
+				logger:   log.New(out, "", 0),
+				out:      out,
+				renderer: renderer,
+			},
+			errOutput: output{
+				logger:   log.New(errOut, "", 0),
+				out:      errOut,
+				renderer: errRenderer,
+			},
 			fatalExitCode: 1,
 			showStack:     true,
 			timeFormat:    "01/02/2006 15:04:05 MST",
@@ -91,23 +93,14 @@ func init() {
 	globalLogger = &l
 }
 
-func updateNormalLogger() {
-	globalLogger.out = io.MultiWriter(append(globalLogger.extraOuts, globalLogger.out)...)
-}
-
-func updateErrLogger() {
-	globalLogger.errOut = io.MultiWriter(append(globalLogger.extraErrOuts, globalLogger.errOut)...)
-}
-
 // Set the output for Debug, Done, Warning, and Info.
 //
 // Default is os.Stdout
 func Out(out io.Writer) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	globalLogger.out = out
-	globalLogger.renderer = lipgloss.NewRenderer(out)
-	updateNormalLogger()
+	globalLogger.normalOutput.out = out
+	globalLogger.normalOutput.renderer = lipgloss.NewRenderer(out)
 	renderLevels(globalLogger, true, false)
 }
 
@@ -117,9 +110,8 @@ func Out(out io.Writer) {
 func ErrOut(out io.Writer) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	globalLogger.errOut = out
-	globalLogger.errRenderer = lipgloss.NewRenderer(out)
-	updateErrLogger()
+	globalLogger.errOutput.out = out
+	globalLogger.errOutput.renderer = lipgloss.NewRenderer(out)
 	renderLevels(globalLogger, false, true)
 }
 
@@ -127,16 +119,14 @@ func ErrOut(out io.Writer) {
 func ExtraOuts(outs []io.Writer) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	globalLogger.extraOuts = outs
-	updateNormalLogger()
+	globalLogger.normalOutput.out = io.MultiWriter(append(outs, globalLogger.normalOutput.out)...)
 }
 
 // Set the extra error output destinations (e.g. logging to a file).
 func ExtraErrOuts(outs []io.Writer) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	globalLogger.extraErrOuts = outs
-	updateErrLogger()
+	globalLogger.errOutput.out = io.MultiWriter(append(outs, globalLogger.errOutput.out)...)
 }
 
 // Set the exit code used by Fatal and FatalMsg.

@@ -21,7 +21,7 @@ func renderLevel(level *Level) {
 	level.renderedMsg = level.Style.Render(level.Message)
 }
 
-func renderLevels(logger *loggerOptions, normalLevels bool, errLevels bool) {
+func renderLevels(logger *logger, normalLevels bool, errLevels bool) {
 	if normalLevels {
 		levels := []*Level{
 			&logger.levels.Debug,

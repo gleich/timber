@@ -26,7 +26,7 @@ func format(level Level, v ...any) *strings.Builder {
 func logNormal(level Level, v ...any) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	globalLogger.logger.Print(format(level, v...).String())
+	globalLogger.normalOutput.logger.Print(format(level, v...).String())
 }
 
 func logError(err error, level Level, v ...any) {
@@ -42,7 +42,7 @@ func logError(err error, level Level, v ...any) {
 		out.WriteRune('\n')
 		out.WriteString(err.Error())
 	}
-	globalLogger.errLogger.Print(out.String())
+	globalLogger.errOutput.logger.Print(out.String())
 }
 
 // Output a DEBUG log message
