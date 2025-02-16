@@ -25,8 +25,8 @@ type logger struct {
 
 type output struct {
 	logger   *log.Logger
-	out      io.Writer
 	renderer *lipgloss.Renderer
+	writer   io.Writer
 }
 
 func init() {
@@ -43,12 +43,12 @@ func init() {
 			mutex: sync.RWMutex{},
 			normalOutput: output{
 				logger:   log.New(out, "", 0),
-				out:      out,
+				writer:   out,
 				renderer: renderer,
 			},
 			errOutput: output{
 				logger:   log.New(errOut, "", 0),
-				out:      errOut,
+				writer:   errOut,
 				renderer: errRenderer,
 			},
 			fatalExitCode: 1,
@@ -96,37 +96,23 @@ func init() {
 // Set the output for Debug, Done, Warning, and Info.
 //
 // Default is os.Stdout
-func Out(out io.Writer) {
+func Out(writer io.Writer) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	globalLogger.normalOutput.out = out
-	globalLogger.normalOutput.renderer = lipgloss.NewRenderer(out)
+	globalLogger.normalOutput.writer = writer
+	globalLogger.normalOutput.renderer = lipgloss.NewRenderer(writer)
 	renderLevels(globalLogger, true, false)
 }
 
 // Set the output for Fatal, FatalMsg, Error, and ErrorMsg.
 //
 // Default is os.Stderr
-func ErrOut(out io.Writer) {
+func ErrOut(writer io.Writer) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	globalLogger.errOutput.out = out
-	globalLogger.errOutput.renderer = lipgloss.NewRenderer(out)
+	globalLogger.errOutput.writer = writer
+	globalLogger.errOutput.renderer = lipgloss.NewRenderer(writer)
 	renderLevels(globalLogger, false, true)
-}
-
-// Set the extra normal output destinations (e.g. logging to a file).
-func ExtraOuts(outs []io.Writer) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.normalOutput.out = io.MultiWriter(append(outs, globalLogger.normalOutput.out)...)
-}
-
-// Set the extra error output destinations (e.g. logging to a file).
-func ExtraErrOuts(outs []io.Writer) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.errOutput.out = io.MultiWriter(append(outs, globalLogger.errOutput.out)...)
 }
 
 // Set the exit code used by Fatal and FatalMsg.
