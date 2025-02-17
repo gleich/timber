@@ -250,13 +250,15 @@ import (
 )
 
 func main() {
-    timber.SetTimezone(time.Local)
-    timber.SetTimeFormat("Mon Jan 2 15:04:05 MST 2006")
-    timber.SetFatalExitCode(0)
+    timber.Timezone(time.Local)
+    timber.TimeFormat("Mon Jan 2 15:04:05 MST 2006")
+    timber.FatalExitCode(0)
 
     timber.Done("calling from custom logger")
 }
 ```
+
+Check the [godoc documentation](https://pkg.go.dev/go.mattglei.ch/timber) to see all the customization functions.
 
 # Examples
 
