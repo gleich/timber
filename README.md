@@ -11,7 +11,7 @@
     <br>
 </div>
 
-_The original package is [github.com/gleich/lumber](https://github.com/gleich/lumber)._
+_The original package is [gleich/lumber](https://github.com/gleich/lumber)._
 
 - [Install](#-install)
 - [Logging Functions](#-logging-functions)
