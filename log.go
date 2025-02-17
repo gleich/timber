@@ -33,14 +33,13 @@ func logError(err error, level Level, v ...any) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
 	out := format(level, v...)
-	if err != nil && globalLogger.showStack {
+	if err != nil {
 		out.WriteRune('\n')
 		out.WriteString(err.Error())
-		out.WriteRune('\n')
-		out.WriteString(string(debug.Stack()))
-	} else if err != nil {
-		out.WriteRune('\n')
-		out.WriteString(err.Error())
+		if globalLogger.showStack {
+			out.WriteRune('\n')
+			out.WriteString(string(debug.Stack()))
+		}
 	}
 	globalLogger.errOutput.logger.Print(out.String())
 }
