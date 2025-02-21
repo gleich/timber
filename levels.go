@@ -21,6 +21,20 @@ func renderLevel(level *Level) {
 	level.renderedMsg = level.Style.Render(level.Message)
 }
 
+func setLevelStyle(level *Level, style lipgloss.Style) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	level.Style = style
+	renderLevel(level)
+}
+
+func setLevel(currentLevel *Level, newLevel Level) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	currentLevel = &newLevel
+	renderLevel(currentLevel)
+}
+
 func renderLevels(logger *logger, normalLevels bool, errLevels bool) {
 	if normalLevels {
 		levels := []*Level{
@@ -48,86 +62,50 @@ func SetLevels(levels Levels) {
 	renderLevels(globalLogger, true, true)
 }
 
-func SetDebug(level Level) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Debug = level
-	renderLevel(&globalLogger.levels.Debug)
+func SetDebug(l Level) {
+	setLevel(&globalLogger.levels.Debug, l)
 }
 
-func SetDebugStyle(style lipgloss.Style) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Debug.Style = style
-	renderLevel(&globalLogger.levels.Debug)
+func SetDebugStyle(s lipgloss.Style) {
+	setLevelStyle(&globalLogger.levels.Debug, s)
 }
 
-func SetInfo(level Level) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Info = level
-	renderLevel(&globalLogger.levels.Info)
+func SetInfo(l Level) {
+	setLevel(&globalLogger.levels.Info, l)
 }
 
-func SetInfoStyle(style lipgloss.Style) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Info.Style = style
-	renderLevel(&globalLogger.levels.Info)
+func SetInfoStyle(s lipgloss.Style) {
+	setLevelStyle(&globalLogger.levels.Info, s)
 }
 
-func SetDone(level Level) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Done = level
-	renderLevel(&globalLogger.levels.Done)
+func SetDone(l Level) {
+	setLevel(&globalLogger.levels.Done, l)
 }
 
-func SetDoneStyle(style lipgloss.Style) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Done.Style = style
-	renderLevel(&globalLogger.levels.Done)
+func SetDoneStyle(s lipgloss.Style) {
+	setLevelStyle(&globalLogger.levels.Done, s)
 }
 
-func SetWarning(level Level) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Warning = level
-	renderLevel(&globalLogger.levels.Warning)
+func SetWarning(l Level) {
+	setLevel(&globalLogger.levels.Warning, l)
 }
 
-func SetWarningStyle(style lipgloss.Style) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Warning.Style = style
-	renderLevel(&globalLogger.levels.Warning)
+func SetWarningStyle(s lipgloss.Style) {
+	setLevelStyle(&globalLogger.levels.Warning, s)
 }
 
-func SetError(level Level) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Error = level
-	renderLevel(&globalLogger.levels.Error)
+func SetError(l Level) {
+	setLevel(&globalLogger.levels.Error, l)
 }
 
-func SetErrorStyle(style lipgloss.Style) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Error.Style = style
-	renderLevel(&globalLogger.levels.Error)
+func SetErrorStyle(s lipgloss.Style) {
+	setLevelStyle(&globalLogger.levels.Error, s)
 }
 
-func SetFatal(level Level) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Fatal = level
-	renderLevel(&globalLogger.levels.Fatal)
+func SetFatal(l Level) {
+	setLevel(&globalLogger.levels.Fatal, l)
 }
 
-func SetFatalStyle(style lipgloss.Style) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.levels.Fatal.Style = style
-	renderLevel(&globalLogger.levels.Fatal)
+func SetFatalStyle(s lipgloss.Style) {
+	setLevelStyle(&globalLogger.levels.Fatal, s)
 }
