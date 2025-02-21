@@ -31,7 +31,7 @@ func setLevelStyle(level *Level, style lipgloss.Style) {
 func setLevel(currentLevel *Level, newLevel Level) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	currentLevel = &newLevel
+	*currentLevel = newLevel
 	renderLevel(currentLevel)
 }
 
