@@ -36,10 +36,8 @@ func init() {
 		renderer    = lipgloss.NewRenderer(out)
 		errRenderer = lipgloss.NewRenderer(errOut)
 		bold        = renderer.NewStyle().Bold(true)
-		errBold     = errRenderer.NewStyle().Bold(true)
-		errStyle    = errRenderer.NewStyle().Inherit(errBold).
-				Foreground(lipgloss.Color("#FF4747"))
-		l = logger{
+		errStyle    = errRenderer.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF4747"))
+		l           = logger{
 			mutex: sync.RWMutex{},
 			normalOutput: output{
 				logger:   log.New(out, "", 0),
