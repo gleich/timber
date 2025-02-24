@@ -133,7 +133,7 @@ func ShowStack(show bool) {
 	globalLogger.showStack = show
 }
 
-// Set the time format that timestamps are formatted with.
+// Set the time format that time stamps are formatted with.
 //
 // Default is 01/02/2006 15:04:05 MST
 func TimeFormat(format string) {
@@ -142,7 +142,7 @@ func TimeFormat(format string) {
 	globalLogger.timeFormat = format
 }
 
-// Set the timezone that timestamps are logged in.
+// Set the timezone that time stamps are logged in.
 //
 // Default is time.UTC
 func Timezone(loc *time.Location) {
