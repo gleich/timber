@@ -81,7 +81,7 @@ func Done(v ...any) {
 	logNormal(globalLogger.levels.Done, v...)
 }
 
-// Output a INFO log message
+// Output an INFO log message
 func Info(v ...any) {
 	logNormal(globalLogger.levels.Info, v...)
 }
@@ -91,12 +91,12 @@ func Warning(v ...any) {
 	logNormal(globalLogger.levels.Warning, v...)
 }
 
-// Output a ERROR log message with information about the error
+// Output an ERROR log message with information about the error
 func Error(err error, v ...any) {
 	logError(err, globalLogger.levels.Error, v...)
 }
 
-// Output a ERROR log message
+// Output an ERROR log message
 func ErrorMsg(v ...any) {
 	logError(nil, globalLogger.levels.Error, v...)
 }

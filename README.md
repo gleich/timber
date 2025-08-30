@@ -170,7 +170,7 @@ Outputs:
 
 ### [`timber.ErrorMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#ErrorMsg)
 
-Output an error message.
+Output an error message with a stack trace.
 
 Demo:
 
@@ -218,7 +218,7 @@ Outputs:
 
 ### [`timber.FatalMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#FatalMsg)
 
-Output a fatal message.
+Output a fatal message with a stack trace.
 
 Demo:
 
