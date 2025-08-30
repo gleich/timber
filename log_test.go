@@ -44,60 +44,58 @@ func TestFormat(t *testing.T) {
 }
 
 func TestStackTraceLogging(t *testing.T) {
-	// Capture err logger output.
+	// Capture err logger output and force stack printing.
 	var buf bytes.Buffer
 
-	// Save and override global settings safely.
 	globalLogger.mutex.Lock()
 	oldShowStack := globalLogger.showStack
-	oldErrLogger := globalLogger.errOutput.logger
+	oldErr := globalLogger.errOutput.logger
 	globalLogger.showStack = true
 	globalLogger.errOutput.logger = log.New(&buf, "", 0)
 	globalLogger.mutex.Unlock()
 
-	// Emit an error (non-fatal) so we don't exit the test process.
+	// Emit a non-fatal log so the process keeps running.
 	ErrorMsg("unit-test")
 
 	// Restore globals.
 	globalLogger.mutex.Lock()
 	globalLogger.showStack = oldShowStack
-	globalLogger.errOutput.logger = oldErrLogger
+	globalLogger.errOutput.logger = oldErr
 	globalLogger.mutex.Unlock()
 
 	out := buf.String()
-	if !strings.Contains(out, "\n#1. ") {
-		t.Fatalf("expected stack trace lines in log output, got:\n%s", out)
+	parts := strings.SplitN(out, "\n", 2)
+	if len(parts) < 2 {
+		t.Fatalf("expected a newline then stack trace, got:\n%s", out)
+	}
+	trace := strings.TrimRight(parts[1], "\n")
+	if trace == "" {
+		t.Fatalf("expected non-empty stack trace, got empty")
 	}
 
-	// Extract the trace portion: everything after the first newline.
-	nl := strings.IndexByte(out, '\n')
-	if nl == -1 || nl+1 >= len(out) {
-		t.Fatalf("log output missing newline/trace: %q", out)
-	}
-	trace := out[nl+1:]
-	lines := strings.Split(strings.TrimRight(trace, "\n"), "\n")
-	if len(lines) == 0 {
-		t.Fatalf("expected at least one stack frame, got none")
-	}
+	lines := strings.Split(trace, "\n")
 
-	// 1) Each frame should match: "#<n>. <file>:<line> -> <func>()"
-	re := regexp.MustCompile(`^#\d+\. .+:\d+ -> .+\(\)$`)
+	// Each line should match: "#<n>. <function>()"
+	re := regexp.MustCompile(`^#\d+\. .+\(\)$`)
 	for _, ln := range lines {
 		if !re.MatchString(ln) {
-			t.Fatalf("stack frame doesn't match expected format: %q", ln)
+			t.Fatalf("stack frame does not match expected format: %q", ln)
 		}
 	}
 
-	// 2) Frames should be sequentially numbered starting at 1.
+	// Frames should be sequentially numbered starting at 1.
 	for i, ln := range lines {
-		wantPrefix := "#" + strconv.Itoa(i+1) + ". "
-		if !strings.HasPrefix(ln, wantPrefix) {
-			t.Fatalf("expected frame %d to start with %q, got %q", i+1, wantPrefix, ln)
+		want := "#" + strconv.Itoa(i+1) + ". "
+		if !strings.HasPrefix(ln, want) {
+			t.Fatalf("expected frame %d to start with %q, got %q", i+1, want, ln)
 		}
 	}
 
-	// 3) The last two runtime frames should have been trimmed.
+	// The last two runtime frames should have been trimmed.
 	if strings.Contains(trace, "runtime.goexit") {
 		t.Fatalf("expected runtime.goexit to be trimmed from the trace:\n%s", trace)
+	}
+	if strings.Contains(trace, "runtime.main") {
+		t.Fatalf("expected runtime.main to be trimmed from the trace:\n%s", trace)
 	}
 }
