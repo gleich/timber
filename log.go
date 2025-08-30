@@ -3,7 +3,7 @@ package timber
 import (
 	"fmt"
 	"os"
-	"runtime/debug"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -14,6 +14,7 @@ func format(level Level, v ...any) *strings.Builder {
 	out.WriteRune(' ')
 	out.WriteString(level.renderedMsg)
 	out.WriteRune(' ')
+
 	for i, item := range v {
 		if i > 0 {
 			out.WriteRune(' ')
@@ -32,16 +33,42 @@ func logNormal(level Level, v ...any) {
 func logError(err error, level Level, v ...any) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
+
 	out := format(level, v...)
 	if err != nil {
 		out.WriteRune('\n')
 		out.WriteString(err.Error())
-		if globalLogger.showStack {
-			out.WriteRune('\n')
-			out.WriteString(string(debug.Stack()))
-		}
+	}
+	if globalLogger.showStack {
+		out.WriteRune('\n')
+		stackTrace(out)
 	}
 	globalLogger.errOutput.logger.Print(out.String())
+}
+
+func stackTrace(builder *strings.Builder) {
+	programCounters := make([]uintptr, 1024)
+	n := runtime.Callers(3, programCounters)
+	if n == 0 {
+		return
+	}
+	programCounters = programCounters[:n]
+
+	// exclude the last two frames (runtime.main, runtime.goexit)
+	if len(programCounters) >= 2 {
+		programCounters = programCounters[:len(programCounters)-2]
+	} else {
+		return
+	}
+
+	frames := runtime.CallersFrames(programCounters)
+	for i := 1; ; i++ {
+		frame, more := frames.Next()
+		fmt.Fprintf(builder, "#%d. %s:%d -> %s()\n", i, frame.File, frame.Line, frame.Function)
+		if !more {
+			break
+		}
+	}
 }
 
 // Output a DEBUG log message
