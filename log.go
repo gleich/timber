@@ -64,7 +64,7 @@ func stackTrace(builder *strings.Builder) {
 	frames := runtime.CallersFrames(programCounters)
 	for i := 1; ; i++ {
 		frame, more := frames.Next()
-		fmt.Fprintf(builder, "#%d. %s:%d -> %s()\n", i, frame.File, frame.Line, frame.Function)
+		fmt.Fprintf(builder, "#%d. %s()\n", i, frame.Function)
 		if !more {
 			break
 		}

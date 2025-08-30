@@ -40,9 +40,9 @@ func main() {
 				timber.Error(err, "failed to read from", fname)
 			}
 		},
-		func() {
-			timber.FatalMsg("fatal message")
-		},
+		// func() {
+		// 	timber.FatalMsg("fatal message")
+		// },
 	}
 
 	for _, demo := range demos {
