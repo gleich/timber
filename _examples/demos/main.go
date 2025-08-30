@@ -43,6 +43,13 @@ func main() {
 		// func() {
 		// 	timber.FatalMsg("fatal message")
 		// },
+		func() {
+			fname := "invisible-file.txt"
+			_, err := os.ReadFile(fname)
+			if err != nil {
+				timber.Fatal(err, "failed to read from", fname)
+			}
+		},
 	}
 
 	for _, demo := range demos {

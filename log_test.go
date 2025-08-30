@@ -74,21 +74,50 @@ func TestStackTraceLogging(t *testing.T) {
 	}
 
 	lines := strings.Split(trace, "\n")
-
-	// Each line should match: "#<n>. <function>()"
-	re := regexp.MustCompile(`^#\d+\. .+\(\)$`)
-	for _, ln := range lines {
-		if !re.MatchString(ln) {
-			t.Fatalf("stack frame does not match expected format: %q", ln)
-		}
+	if len(lines) == 0 {
+		t.Fatalf("expected at least one stack frame, got none")
 	}
 
-	// Frames should be sequentially numbered starting at 1.
+	// Formats:
+	// - Non-last lines: "#<n>. <func>() [<file>:<line>]"
+	// - Last line:      "#<n>. <func>()"
+	withSite := regexp.MustCompile(`^#\d+\. .+\(\) \[(.+):(\d+)\]$`)
+	noSite := regexp.MustCompile(`^#\d+\. .+\(\)$`)
+
+	// Check numbering + per-line format
 	for i, ln := range lines {
 		want := "#" + strconv.Itoa(i+1) + ". "
 		if !strings.HasPrefix(ln, want) {
 			t.Fatalf("expected frame %d to start with %q, got %q", i+1, want, ln)
 		}
+
+		if i < len(lines)-1 {
+			m := withSite.FindStringSubmatch(ln)
+			if m == nil {
+				t.Fatalf("expected frame %d to include file:line, got %q", i+1, ln)
+			}
+			// Optional sanity: file should look like a Go file
+			if !strings.HasSuffix(m[1], ".go") && !strings.Contains(m[1], ".go/") &&
+				!strings.Contains(m[1], ".go:") {
+				t.Fatalf("expected a .go file path in frame %d, got %q", i+1, m[1])
+			}
+		} else {
+			if !noSite.MatchString(ln) {
+				t.Fatalf("expected last frame to omit [file:line], got %q", ln)
+			}
+		}
+	}
+
+	foundTestCaller := false
+	maxCheck := len(lines) - 1 // exclude the last frame (no [file:line])
+	for i := 0; i < maxCheck; i++ {
+		if strings.Contains(lines[i], "_test.go:") {
+			foundTestCaller = true
+			break
+		}
+	}
+	if !foundTestCaller {
+		t.Fatalf("expected at least one frame to reference a _test.go call site, got:\n%s", trace)
 	}
 
 	// The last two runtime frames should have been trimmed.

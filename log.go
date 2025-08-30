@@ -47,26 +47,40 @@ func logError(err error, level Level, v ...any) {
 }
 
 func stackTrace(builder *strings.Builder) {
-	programCounters := make([]uintptr, 1024)
-	n := runtime.Callers(3, programCounters)
+	pcs := make([]uintptr, 64)
+	n := runtime.Callers(3, pcs) // skip runtime.Callers, stackTrace, logError/Error*
 	if n == 0 {
 		return
 	}
-	programCounters = programCounters[:n]
+	pcs = pcs[:n]
 
-	// exclude the last two frames (runtime.main, runtime.goexit)
-	if len(programCounters) >= 2 {
-		programCounters = programCounters[:len(programCounters)-2]
-	} else {
+	if len(pcs) < 2 {
 		return
 	}
+	pcs = pcs[:len(pcs)-2]
 
-	frames := runtime.CallersFrames(programCounters)
-	for i := 1; ; i++ {
-		frame, more := frames.Next()
-		fmt.Fprintf(builder, "#%d. %s()\n", i, frame.Function)
+	fr := runtime.CallersFrames(pcs)
+	var frames []runtime.Frame
+	for {
+		f, more := fr.Next()
+		frames = append(frames, f)
 		if !more {
 			break
+		}
+	}
+
+	for i := 0; i < len(frames); i++ {
+		if i+1 < len(frames) {
+			fmt.Fprintf(
+				builder,
+				"#%d. %s() [%s:%d]\n",
+				i+1,
+				frames[i].Function,
+				frames[i+1].File,
+				frames[i+1].Line,
+			)
+		} else {
+			fmt.Fprintf(builder, "#%d. %s()\n", i+1, frames[i].Function)
 		}
 	}
 }
