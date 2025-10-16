@@ -48,9 +48,9 @@ func TestStackTraceLogging(t *testing.T) {
 	var buf bytes.Buffer
 
 	globalLogger.mutex.Lock()
-	oldShowStack := globalLogger.showStack
+	oldShowStack := globalLogger.showErrorStack
 	oldErr := globalLogger.errOutput.logger
-	globalLogger.showStack = true
+	globalLogger.showErrorStack = true
 	globalLogger.errOutput.logger = log.New(&buf, "", 0)
 	globalLogger.mutex.Unlock()
 
@@ -59,7 +59,7 @@ func TestStackTraceLogging(t *testing.T) {
 
 	// Restore globals.
 	globalLogger.mutex.Lock()
-	globalLogger.showStack = oldShowStack
+	globalLogger.showErrorStack = oldShowStack
 	globalLogger.errOutput.logger = oldErr
 	globalLogger.mutex.Unlock()
 

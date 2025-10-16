@@ -30,7 +30,7 @@ func logNormal(level Level, v ...any) {
 	globalLogger.normalOutput.logger.Print(format(level, v...).String())
 }
 
-func logError(err error, level Level, v ...any) {
+func logError(err error, level Level, outputStack bool, v ...any) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
 
@@ -39,7 +39,7 @@ func logError(err error, level Level, v ...any) {
 		out.WriteRune('\n')
 		out.WriteString(err.Error())
 	}
-	if globalLogger.showStack {
+	if outputStack {
 		out.WriteRune('\n')
 		stackTrace(out)
 	}
@@ -107,22 +107,22 @@ func Warning(v ...any) {
 
 // Output an ERROR log message with information about the error
 func Error(err error, v ...any) {
-	logError(err, globalLogger.levels.Error, v...)
+	logError(err, globalLogger.levels.Error, globalLogger.showErrorStack, v...)
 }
 
 // Output an ERROR log message
 func ErrorMsg(v ...any) {
-	logError(nil, globalLogger.levels.Error, v...)
+	logError(nil, globalLogger.levels.Error, globalLogger.showErrorStack, v...)
 }
 
 // Output a FATAL log message with information about the error
 func Fatal(err error, v ...any) {
-	logError(err, globalLogger.levels.Fatal, v...)
+	logError(err, globalLogger.levels.Fatal, globalLogger.showFatalStack, v...)
 	os.Exit(globalLogger.fatalExitCode)
 }
 
 // Output a FATAL log message
 func FatalMsg(v ...any) {
-	logError(nil, globalLogger.levels.Fatal, v...)
+	logError(nil, globalLogger.levels.Fatal, globalLogger.showFatalStack, v...)
 	os.Exit(globalLogger.fatalExitCode)
 }

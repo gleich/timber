@@ -13,14 +13,15 @@ import (
 var globalLogger *logger
 
 type logger struct {
-	mutex         sync.RWMutex
-	normalOutput  output
-	errOutput     output
-	fatalExitCode int
-	showStack     bool
-	timeFormat    string
-	timezone      *time.Location
-	levels        Levels
+	mutex          sync.RWMutex
+	normalOutput   output
+	errOutput      output
+	fatalExitCode  int
+	showErrorStack bool
+	showFatalStack bool
+	timeFormat     string
+	timezone       *time.Location
+	levels         Levels
 }
 
 type output struct {
@@ -49,10 +50,11 @@ func init() {
 				writer:   errOut,
 				renderer: errRenderer,
 			},
-			fatalExitCode: 1,
-			showStack:     true,
-			timeFormat:    "01/02/2006 15:04:05 MST",
-			timezone:      time.UTC,
+			fatalExitCode:  1,
+			showErrorStack: true,
+			showFatalStack: true,
+			timeFormat:     "01/02/2006 15:04:05 MST",
+			timezone:       time.UTC,
 			levels: Levels{
 				Debug: Level{
 					Message: "DEBUG",
@@ -122,13 +124,22 @@ func FatalExitCode(code int) {
 	globalLogger.fatalExitCode = code
 }
 
-// Set if the stack trace should be shown or not when calling Error or Fatal.
+// Set if the stack trace should be shown or not when calling Error.
 //
 // Default is true
-func ShowStack(show bool) {
+func ShowErrorStack(show bool) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	globalLogger.showStack = show
+	globalLogger.showErrorStack = show
+}
+
+// Set if the stack trace should be shown or not when calling Fatal.
+//
+// Default is true
+func ShowFatalStack(show bool) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.showFatalStack = show
 }
 
 // Set the time format that time stamps are formatted with.

@@ -238,7 +238,7 @@ Outputs:
 
 ## Customization
 
-You can customize the logger that timber uses. Below is an example of some of this customization:
+You can customize a number of different features of timber. Below is an example of some of this customization:
 
 ```go
 package main
