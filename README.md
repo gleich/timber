@@ -62,6 +62,13 @@ Outputs:
 
 ![Done output](images/done.png)
 
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Donef()`. Example:
+
+```go
+timber.Donef("running for %d minutes", 21)
+```
+
 ### [`timber.Info()`](https://pkg.go.dev/go.mattglei.ch/timber#Info)
 
 Output a info log.
@@ -88,6 +95,13 @@ Outputs:
 
 ![info output](images/info.png)
 
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Infof()`. Example:
+
+```go
+timber.Infof("I am %d years old", 21)
+```
+
 ### [`timber.Debug()`](https://pkg.go.dev/go.mattglei.ch/timber#Debug)
 
 Output a debug log.
@@ -112,6 +126,13 @@ func main() {
 Outputs:
 
 ![debug output](images/debug.png)
+
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Debugf()`. Example:
+
+```go
+timber.Debugf("The value of foo is %t", true)
+```
 
 ### [`timber.Warning()`](https://pkg.go.dev/go.mattglei.ch/timber#Warning)
 
@@ -139,6 +160,13 @@ func main() {
 Outputs:
 
 ![warning output](images/warning.png)
+
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Warningf()`. Example:
+
+```go
+timber.Warningf("Responded with a HTTP status code of %d.", 404)
+```
 
 ### [`timber.Error()`](https://pkg.go.dev/go.mattglei.ch/timber#Error)
 
@@ -168,6 +196,13 @@ Outputs:
 
 ![error output](images/error.png)
 
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Errorf()`. Example:
+
+```go
+timber.Errorf(err, "Failed to open file from the %s directory", "/usr/bin")
+```
+
 ### [`timber.ErrorMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#ErrorMsg)
 
 Output an error message with a stack trace.
@@ -187,6 +222,13 @@ func main() {
 Outputs:
 
 ![errorMsg output](images/errorMsg.png)
+
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.ErrorMsgf()`. Example:
+
+```go
+timber.ErrorMsgf("Failed to open file from the %s directory", "/usr/bin")
+```
 
 ### [`timber.Fatal()`](https://pkg.go.dev/go.mattglei.ch/timber#Fatal)
 
@@ -216,6 +258,13 @@ Outputs:
 
 ![fatal output](images/fatal.png)
 
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Fatalf()`. Example:
+
+```go
+timber.Fatalf(err, "Failed to delete %s from the system", "/usr/bin/timber")
+```
+
 ### [`timber.FatalMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#FatalMsg)
 
 Output a fatal message with a stack trace.
@@ -235,6 +284,13 @@ func main() {
 Outputs:
 
 ![fatalMsg output](images/fatalMsg.png)
+
+> [!NOTE]
+> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.FatalMsgf()`. Example:
+
+```go
+timber.FatalMsgf("Failed to delete %s from the system", "/usr/bin/timber")
+```
 
 ## Customization
 

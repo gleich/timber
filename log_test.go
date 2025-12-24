@@ -22,7 +22,7 @@ func TestFormat(t *testing.T) {
 
 	level := Level{renderedMsg: "TEST"}
 	args := []any{"hello", "world"}
-	output := format(level, args...)
+	output := formatLog(level, args...)
 
 	parts := strings.SplitN(output.String(), " ", 3)
 	if len(parts) != 3 {
