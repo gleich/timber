@@ -19,22 +19,22 @@ type Level struct {
 	renderedMsg string
 }
 
-func renderLevel(level *Level) {
-	level.renderedMsg = level.Style.Render(level.Message)
+func (l *Level) render() {
+	l.renderedMsg = l.Style.Render(l.Message)
 }
 
-func setLevelStyle(level *Level, style lipgloss.Style) {
+func (l *Level) style(style lipgloss.Style) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	level.Style = style
-	renderLevel(level)
+	l.Style = style
+	l.render()
 }
 
-func setLevel(currentLevel *Level, newLevel Level) {
+func (l *Level) set(newLevel Level) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
-	*currentLevel = newLevel
-	renderLevel(currentLevel)
+	*l = newLevel
+	l.render()
 }
 
 func renderLevels(logger *logger, normalLevels bool, errLevels bool) {
@@ -47,12 +47,12 @@ func renderLevels(logger *logger, normalLevels bool, errLevels bool) {
 			&logger.levels.Warning,
 		}
 		for _, level := range levels {
-			renderLevel(level)
+			level.render()
 		}
 	case errLevels:
 		levels := []*Level{&logger.levels.Error, &logger.levels.Fatal}
 		for _, level := range levels {
-			renderLevel(level)
+			level.render()
 		}
 	}
 }
@@ -75,60 +75,60 @@ func SetLevels(levels Levels) {
 
 // Set the level for the debug level
 func SetDebug(l Level) {
-	setLevel(&globalLogger.levels.Debug, l)
+	globalLogger.levels.Debug.set(l)
 }
 
 // Set the style for the debug level
 func SetDebugStyle(s lipgloss.Style) {
-	setLevelStyle(&globalLogger.levels.Debug, s)
+	globalLogger.levels.Debug.style(s)
 }
 
 // Set the level for the info level
 func SetInfo(l Level) {
-	setLevel(&globalLogger.levels.Info, l)
+	globalLogger.levels.Info.set(l)
 }
 
 // Set the style for the info level
 func SetInfoStyle(s lipgloss.Style) {
-	setLevelStyle(&globalLogger.levels.Info, s)
+	globalLogger.levels.Info.style(s)
 }
 
 // Set the level for the done level
 func SetDone(l Level) {
-	setLevel(&globalLogger.levels.Done, l)
+	globalLogger.levels.Done.set(l)
 }
 
 // Set the style for the done level
 func SetDoneStyle(s lipgloss.Style) {
-	setLevelStyle(&globalLogger.levels.Done, s)
+	globalLogger.levels.Done.style(s)
 }
 
 // Set the level for the warning level
 func SetWarning(l Level) {
-	setLevel(&globalLogger.levels.Warning, l)
+	globalLogger.levels.Warning.set(l)
 }
 
 // Set the style for the warning level
 func SetWarningStyle(s lipgloss.Style) {
-	setLevelStyle(&globalLogger.levels.Warning, s)
+	globalLogger.levels.Warning.style(s)
 }
 
 // Set the level for the error level
 func SetError(l Level) {
-	setLevel(&globalLogger.levels.Error, l)
+	globalLogger.levels.Error.set(l)
 }
 
 // Set the style for the error level
 func SetErrorStyle(s lipgloss.Style) {
-	setLevelStyle(&globalLogger.levels.Error, s)
+	globalLogger.levels.Error.style(s)
 }
 
 // Set the level for the fatal level
 func SetFatal(l Level) {
-	setLevel(&globalLogger.levels.Fatal, l)
+	globalLogger.levels.Fatal.set(l)
 }
 
 // Set the style for the fatal level
 func SetFatalStyle(s lipgloss.Style) {
-	setLevelStyle(&globalLogger.levels.Fatal, s)
+	globalLogger.levels.Fatal.style(s)
 }
