@@ -38,8 +38,7 @@ func (l *Level) set(newLevel Level) {
 }
 
 func renderLevels(logger *logger, normalLevels bool, errLevels bool) {
-	switch {
-	case normalLevels:
+	if normalLevels {
 		levels := []*Level{
 			&logger.levels.Debug,
 			&logger.levels.Info,
@@ -49,7 +48,8 @@ func renderLevels(logger *logger, normalLevels bool, errLevels bool) {
 		for _, level := range levels {
 			level.render()
 		}
-	case errLevels:
+	}
+	if errLevels {
 		levels := []*Level{&logger.levels.Error, &logger.levels.Fatal}
 		for _, level := range levels {
 			level.render()
