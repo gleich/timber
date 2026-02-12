@@ -22,6 +22,7 @@ type logger struct {
 	timeFormat     string
 	timezone       *time.Location
 	levels         Levels
+	stackPathStyle lipgloss.Style
 }
 
 type output struct {
@@ -36,7 +37,7 @@ func init() {
 		errOut      = os.Stderr
 		renderer    = lipgloss.NewRenderer(out)
 		errRenderer = lipgloss.NewRenderer(errOut)
-		bold        = renderer.NewStyle().Bold(true)
+		bold        = lipgloss.NewStyle().Bold(true)
 		errStyle    = errRenderer.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF4747"))
 		l           = logger{
 			mutex: sync.RWMutex{},
@@ -53,6 +54,7 @@ func init() {
 			fatalExitCode:  1,
 			showErrorStack: true,
 			showFatalStack: true,
+			stackPathStyle: errRenderer.NewStyle().Foreground(lipgloss.Color("#6c6c6c")),
 			timeFormat:     "01/02/2006 15:04:05 MST",
 			timezone:       time.UTC,
 			levels: Levels{

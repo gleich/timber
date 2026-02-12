@@ -3,7 +3,6 @@ package timber
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -19,7 +18,7 @@ func formatLog(level Level, v ...any) *strings.Builder {
 		if i > 0 {
 			out.WriteRune(' ')
 		}
-		out.WriteString(fmt.Sprint(item))
+		fmt.Fprint(&out, item)
 	}
 	return &out
 }
@@ -38,11 +37,21 @@ func logError(err error, level Level, outputStack bool, v ...any) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
 
-	out := formatLog(level, v...)
+	var errorText string
 	if err != nil {
-		out.WriteRune('\n')
-		out.WriteString(err.Error())
+		errorText = err.Error()
 	}
+	var out *strings.Builder
+	if len(v) == 0 {
+		out = formatLog(level, errorText)
+	} else {
+		out = formatLog(level, v...)
+		if err != nil {
+			out.WriteRune('\n')
+			out.WriteString(err.Error())
+		}
+	}
+
 	if outputStack {
 		out.WriteRune('\n')
 		stackTrace(out)
@@ -52,45 +61,6 @@ func logError(err error, level Level, outputStack bool, v ...any) {
 
 func logErrorFormatted(err error, level Level, outputStack bool, format string, v ...any) {
 	logError(err, level, outputStack, fmt.Sprintf(format, v...))
-}
-
-func stackTrace(builder *strings.Builder) {
-	pcs := make([]uintptr, 64)
-	n := runtime.Callers(3, pcs) // skip runtime.Callers, stackTrace, logError/Error*
-	if n == 0 {
-		return
-	}
-	pcs = pcs[:n]
-
-	if len(pcs) < 2 {
-		return
-	}
-	pcs = pcs[:len(pcs)-2]
-
-	fr := runtime.CallersFrames(pcs)
-	var frames []runtime.Frame
-	for {
-		f, more := fr.Next()
-		frames = append(frames, f)
-		if !more {
-			break
-		}
-	}
-
-	for i := 0; i < len(frames); i++ {
-		if i+1 < len(frames) {
-			fmt.Fprintf(
-				builder,
-				"#%d. %s() [%s:%d]\n",
-				i+1,
-				frames[i].Function,
-				frames[i+1].File,
-				frames[i+1].Line,
-			)
-		} else {
-			fmt.Fprintf(builder, "#%d. %s()\n", i+1, frames[i].Function)
-		}
-	}
 }
 
 // Output a DEBUG-level message
