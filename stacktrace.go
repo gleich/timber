@@ -24,10 +24,7 @@ func framesFromCall(skip int) []frame {
 		if parameterStart != -1 {
 			function = fmt.Sprintf("%s()", function[:parameterStart])
 		}
-		f.function = strings.TrimPrefix(
-			strings.TrimSuffix(function, " in goroutine"),
-			"created by ",
-		)
+		f.function = strings.TrimPrefix(function, "created by ")
 
 		pathParts := strings.Split(lines[i+1], " ")
 		f.path = strings.TrimSpace(strings.Join(pathParts[:len(pathParts)-1], " "))
