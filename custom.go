@@ -54,7 +54,7 @@ func init() {
 			fatalExitCode:  1,
 			showErrorStack: true,
 			showFatalStack: true,
-			stackPathStyle: errRenderer.NewStyle().Foreground(lipgloss.Color("#6c6c6c")),
+			stackPathStyle: errRenderer.NewStyle().Foreground(lipgloss.Color("#6C6C6C")),
 			timeFormat:     "01/02/2006 15:04:05 MST",
 			timezone:       time.UTC,
 			levels: Levels{
@@ -133,6 +133,15 @@ func ShowErrorStack(show bool) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
 	globalLogger.showErrorStack = show
+}
+
+// Set the style of the path for a stack trace.
+//
+// Default is #6C6C6C
+func StackPathStyle(style lipgloss.Style) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.stackPathStyle = style
 }
 
 // Set if the stack trace should be shown or not when calling Fatal.

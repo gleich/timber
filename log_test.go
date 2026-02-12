@@ -79,14 +79,14 @@ func TestStackTraceLogging(t *testing.T) {
 	}
 
 	// Formats:
-	// - Non-last lines: "#<n>. <func>() [<file>:<line>]"
-	// - Last line:      "#<n>. <func>()"
-	withSite := regexp.MustCompile(`^#\d+\. .+\(\) \[(.+):(\d+)\]$`)
-	noSite := regexp.MustCompile(`^#\d+\. .+\(\)$`)
+	// - Non-last lines: "<n>. <func>() [<file>:<line>]"
+	// - Last line:      "<n>. <func>()"
+	withSite := regexp.MustCompile(`^\d+\. .+\(\) \[(.+):(\d+)\]$`)
+	noSite := regexp.MustCompile(`^\d+\. .+\(\)$`)
 
 	// Check numbering + per-line format
 	for i, ln := range lines {
-		want := "#" + strconv.Itoa(i+1) + ". "
+		want := strconv.Itoa(i+1) + ". "
 		if !strings.HasPrefix(ln, want) {
 			t.Fatalf("expected frame %d to start with %q, got %q", i+1, want, ln)
 		}
@@ -110,7 +110,7 @@ func TestStackTraceLogging(t *testing.T) {
 
 	foundTestCaller := false
 	maxCheck := len(lines) - 1 // exclude the last frame (no [file:line])
-	for i := 0; i < maxCheck; i++ {
+	for i := range maxCheck {
 		if strings.Contains(lines[i], "_test.go:") {
 			foundTestCaller = true
 			break

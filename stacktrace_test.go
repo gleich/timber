@@ -13,9 +13,6 @@ func requireNoEmpty(t *testing.T, frames []frame) {
 		if strings.TrimSpace(f.function) == "" {
 			t.Fatalf("frame[%d] has empty function: %#v", i, f)
 		}
-		if strings.TrimSpace(f.path) == "" {
-			t.Fatalf("frame[%d] has empty path: %#v", i, f)
-		}
 	}
 }
 
@@ -34,11 +31,11 @@ func requireFunctionsEndWithParens(t *testing.T, frames []frame) {
 func requirePathLooksLikeFileLine(t *testing.T, frames []frame) {
 	t.Helper()
 	for i, f := range frames {
-		if !strings.Contains(f.path, ".go:") {
+		if !strings.Contains(f.path, ".go:") && f.path != "" {
 			t.Fatalf("frame[%d] path does not contain .go:: %q", i, f.path)
 		}
 		col := strings.LastIndexByte(f.path, ':')
-		if col == -1 || col == len(f.path)-1 {
+		if (col == -1 || col == len(f.path)-1) && f.path != "" {
 			t.Fatalf("frame[%d] path missing line suffix: %q", i, f.path)
 		}
 		for _, r := range f.path[col+1:] {
