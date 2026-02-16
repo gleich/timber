@@ -19,7 +19,7 @@ func main() {
 func caller(wg *sync.WaitGroup) {
 	_, err := os.Stat("foo")
 	if err != nil {
-		timber.Fatal(err)
+		timber.Fatal(err, "foo bar")
 	}
 	wg.Done()
 }

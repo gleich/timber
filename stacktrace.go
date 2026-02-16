@@ -44,8 +44,8 @@ func framesFromCall(skip int) []frame {
 	return frames
 }
 
-func stackTrace(builder *strings.Builder) {
-	frames := framesFromCall(4)
+func stackTrace(builder *strings.Builder, skip int) {
+	frames := framesFromCall(skip)
 	for i, f := range frames {
 		trace := fmt.Sprintf("%d. %s", i+1, f.function)
 		if f.path != "" {

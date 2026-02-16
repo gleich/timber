@@ -32,7 +32,7 @@ func logFormatted(level Level, format string, v ...any) {
 	logNormal(level, fmt.Sprintf(format, v...))
 }
 
-func logError(err error, level Level, outputStack bool, v ...any) {
+func logError(err error, level Level, outputStack bool, formatted bool, v ...any) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
 
@@ -53,11 +53,15 @@ func logError(err error, level Level, outputStack bool, v ...any) {
 
 	if outputStack {
 		out.WriteRune('\n')
-		stackTrace(out)
+		callHeight := 4
+		if formatted {
+			callHeight++
+		}
+		stackTrace(out, callHeight)
 	}
 	globalLogger.errOutput.logger.Print(out.String())
 }
 
 func logErrorFormatted(err error, level Level, outputStack bool, format string, v ...any) {
-	logError(err, level, outputStack, fmt.Sprintf(format, v...))
+	logError(err, level, outputStack, true, fmt.Sprintf(format, v...))
 }
