@@ -58,6 +58,7 @@ func init() {
 			stackPathStyle: errRenderer.NewStyle().Foreground(lipgloss.Color("#6C6C6C")),
 			timeFormat:     "01/02/2006 15:04:05 MST",
 			timezone:       time.UTC,
+			displayTime:    true,
 			levels: Levels{
 				Debug: Level{
 					Message: "DEBUG",
