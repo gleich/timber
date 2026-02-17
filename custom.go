@@ -19,6 +19,7 @@ type logger struct {
 	fatalExitCode  int
 	showErrorStack bool
 	showFatalStack bool
+	displayTime    bool
 	timeFormat     string
 	timezone       *time.Location
 	levels         Levels
@@ -151,6 +152,15 @@ func ShowFatalStack(show bool) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
 	globalLogger.showFatalStack = show
+}
+
+// Set if the time should be shown at all or not.
+//
+// Default is true
+func DisplayTime(display bool) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.displayTime = display
 }
 
 // Set the time format that time stamps are formatted with.

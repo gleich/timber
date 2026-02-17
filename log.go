@@ -8,8 +8,10 @@ import (
 
 func formatLog(level Level, v ...any) *strings.Builder {
 	var out strings.Builder
-	out.WriteString(time.Now().In(globalLogger.timezone).Format(globalLogger.timeFormat))
-	out.WriteRune(' ')
+	if globalLogger.displayTime {
+		out.WriteString(time.Now().In(globalLogger.timezone).Format(globalLogger.timeFormat))
+		out.WriteRune(' ')
+	}
 	out.WriteString(level.renderedMsg)
 	out.WriteRune(' ')
 
