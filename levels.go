@@ -71,6 +71,11 @@ func SetLevels(levels Levels) {
 	renderLevels(globalLogger, true, true)
 }
 
+// Get the current levels
+func GetLevels() Levels {
+	return globalLogger.levels
+}
+
 // Set the level for the debug level
 func SetDebug(l Level) {
 	globalLogger.levels.Debug.set(l)
