@@ -25,8 +25,6 @@ func formatLog(level Level, v ...any) *strings.Builder {
 }
 
 func logNormal(level Level, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
 	globalLogger.normalOutput.logger.Print(formatLog(level, v...).String())
 }
 
@@ -34,10 +32,14 @@ func logFormatted(level Level, format string, v ...any) {
 	logNormal(level, fmt.Sprintf(format, v...))
 }
 
-func logError(err error, level Level, outputStack bool, formatted bool, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
+func logDurationNormal(level Level, start time.Time, v ...any) {
+	logNormal(
+		level,
+		append([]any{globalLogger.durationFormatter(time.Since(start))}, v...)...,
+	)
+}
 
+func logError(err error, level Level, outputStack bool, formatted bool, v ...any) {
 	var errorText string
 	if err != nil {
 		errorText = err.Error()
@@ -62,6 +64,16 @@ func logError(err error, level Level, outputStack bool, formatted bool, v ...any
 		stackTrace(out, callHeight)
 	}
 	globalLogger.errOutput.logger.Print(out.String())
+}
+
+func logDurationError(err error, level Level, outputStack bool, start time.Time, v ...any) {
+	logError(
+		err,
+		level,
+		outputStack,
+		false,
+		append([]any{globalLogger.durationFormatter(time.Since(start))}, v...)...,
+	)
 }
 
 func logErrorFormatted(err error, level Level, outputStack bool, format string, v ...any) {

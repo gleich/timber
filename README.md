@@ -36,6 +36,8 @@ go get -u go.mattglei.ch/timber
 
 ## Logging Functions
 
+To see a complete reference for the logging functions view the [package documentation](https://pkg.go.dev/go.mattglei.ch).
+
 ### [`timber.Done()`](https://pkg.go.dev/go.mattglei.ch/timber#Done)
 
 Output a "DONE" log.

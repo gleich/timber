@@ -13,17 +13,18 @@ import (
 var globalLogger *logger
 
 type logger struct {
-	mutex          sync.RWMutex
-	normalOutput   output
-	errOutput      output
-	fatalExitCode  int
-	showErrorStack bool
-	showFatalStack bool
-	displayTime    bool
-	timeFormat     string
-	timezone       *time.Location
-	levels         Levels
-	stackPathStyle lipgloss.Style
+	mutex             sync.RWMutex
+	normalOutput      output
+	errOutput         output
+	fatalExitCode     int
+	showErrorStack    bool
+	showFatalStack    bool
+	displayTime       bool
+	durationFormatter func(time.Duration) string
+	timeFormat        string
+	timezone          *time.Location
+	levels            Levels
+	stackPathStyle    lipgloss.Style
 }
 
 type output struct {
@@ -52,13 +53,14 @@ func init() {
 				writer:   errOut,
 				renderer: errRenderer,
 			},
-			fatalExitCode:  1,
-			showErrorStack: true,
-			showFatalStack: true,
-			stackPathStyle: errRenderer.NewStyle().Foreground(lipgloss.Color("#6C6C6C")),
-			timeFormat:     "01/02/2006 15:04:05 MST",
-			timezone:       time.UTC,
-			displayTime:    true,
+			fatalExitCode:     1,
+			showErrorStack:    true,
+			showFatalStack:    true,
+			stackPathStyle:    errRenderer.NewStyle().Foreground(lipgloss.Color("#6C6C6C")),
+			timeFormat:        "01/02/2006 15:04:05 MST",
+			timezone:          time.UTC,
+			displayTime:       true,
+			durationFormatter: formatDuration,
 			levels: Levels{
 				Debug: Level{
 					Message: "DEBUG",
