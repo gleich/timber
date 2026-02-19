@@ -157,6 +157,13 @@ func ShowFatalStack(show bool) {
 	globalLogger.showFatalStack = show
 }
 
+// Set the function used to format durations for timber.*Since functions.
+func DurationFormatter(fn func(time.Duration) string) {
+	globalLogger.mutex.Lock()
+	defer globalLogger.mutex.Unlock()
+	globalLogger.durationFormatter = fn
+}
+
 // Set if the time should be shown at all or not.
 //
 // Default is true
