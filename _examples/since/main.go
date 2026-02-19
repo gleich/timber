@@ -12,7 +12,7 @@ import (
 func main() {
 	demos := []func(time.Time){
 		func(start time.Time) {
-			timber.DoneSince(start, "waited 2 seconds")
+			timber.DoneSince(start, "hello")
 		},
 		func(start time.Time) {
 			now := time.Now()

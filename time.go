@@ -23,14 +23,14 @@ func formatDuration(d time.Duration) string {
 			if ms == 0 && d > 0 {
 				ms = 1
 			}
-			return fmt.Sprintf("[%s%dms]", sign, ms)
+			return fmt.Sprintf("(%s%dms)", sign, ms)
 		}
 
 		us := d.Microseconds()
 		if us == 0 && d > 0 {
 			us = 1
 		}
-		return fmt.Sprintf("[%s%dµs]", sign, us)
+		return fmt.Sprintf("(%s%dµs)", sign, us)
 	}
 
 	var parts []string
@@ -53,5 +53,5 @@ func formatDuration(d time.Duration) string {
 	sec := float64(d) / float64(time.Second)
 	parts = append(parts, fmt.Sprintf("%.1fs", sec))
 
-	return fmt.Sprintf("[%s%s]", sign, strings.Join(parts, " "))
+	return fmt.Sprintf("(%s%s)", sign, strings.Join(parts, " "))
 }

@@ -35,7 +35,7 @@ func logFormatted(level Level, format string, v ...any) {
 func logDurationNormal(level Level, start time.Time, v ...any) {
 	logNormal(
 		level,
-		append([]any{globalLogger.durationFormatter(time.Since(start))}, v...)...,
+		append(v, globalLogger.durationFormatter(time.Since(start)))...,
 	)
 }
 
@@ -72,7 +72,7 @@ func logDurationError(err error, level Level, outputStack bool, start time.Time,
 		level,
 		outputStack,
 		false,
-		append([]any{globalLogger.durationFormatter(time.Since(start))}, v...)...,
+		append(v, globalLogger.durationFormatter(time.Since(start)))...,
 	)
 }
 
