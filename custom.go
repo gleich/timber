@@ -79,17 +79,17 @@ func init() {
 						Foreground(lipgloss.Color("#2B95FF")),
 				},
 				Info: Level{
-					Message: "INFO ",
+					Message: "INFO",
 					Style:   bold,
 				},
 				Done: Level{
-					Message: "DONE ",
+					Message: "DONE",
 					Style: renderer.NewStyle().
 						Inherit(bold).
 						Foreground(lipgloss.Color("#30CE75")),
 				},
 				Warning: Level{
-					Message: "WARN ",
+					Message: "WARN",
 					Style: renderer.NewStyle().
 						Inherit(bold).
 						Foreground(lipgloss.Color("#E1DC3F")),

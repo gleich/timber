@@ -6,15 +6,6 @@ import (
 	"time"
 )
 
-func insertDuration(msg *string, attributes *[]Value, start time.Time) {
-	dur := formatDuration(time.Since(start))
-	if globalLogger.structured.enabled {
-		*attributes = append([]Value{{"duration", dur}}, *attributes...)
-	} else {
-		*msg = fmt.Sprintf("%s (%s)", *msg, dur)
-	}
-}
-
 func formatDuration(d time.Duration) string {
 	if d == 0 {
 		return "0s"

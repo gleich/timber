@@ -1,6 +1,10 @@
 package timber
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"fmt"
+
+	"github.com/charmbracelet/lipgloss"
+)
 
 // Levels used by timber for logging
 type Levels struct {
@@ -20,7 +24,7 @@ type Level struct {
 }
 
 func (l *Level) render() {
-	l.renderedMsg = l.Style.Render(l.Message)
+	l.renderedMsg = l.Style.Render(fmt.Sprintf("%-5s", l.Message))
 }
 
 func (l *Level) style(style lipgloss.Style) {

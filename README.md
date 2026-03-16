@@ -6,7 +6,7 @@
     <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/gleich/timber">
     <img alt="Golang report card" src ="https://goreportcard.com/badge/go.mattglei.ch/timber">
     <br>
-    <i>Easy to use & pretty logger for golang</i>
+    <i>Plain or structured logs for golang</i>
     <br>
     <br>
 </div>
@@ -34,6 +34,32 @@ Simply run the following from your project root:
 go get -u go.mattglei.ch/timber
 ```
 
+## Structured Logging
+
+By default, timber outputs human-readable plain logs. To enable structured (key=value) output:
+
+```go
+timber.Structured(true)
+```
+
+You can attach additional context to any log call using `timber.Value`:
+
+```go
+timber.Info("user signed in",
+	timber.Value{Key: "user_id", Data: 42},
+	timber.Value{Key: "method", Data: "oauth"}
+)
+```
+
+For brevity, use the `timber.V` shorthand:
+
+```go
+timber.Info("user signed in",
+	timber.V("user_id", 42),
+	timber.V("method", "oauth")
+)
+```
+
 ## Logging Functions
 
 To see a complete reference for the logging functions view the [package documentation](https://pkg.go.dev/go.mattglei.ch).
@@ -45,31 +71,17 @@ Output a "DONE" log.
 Demo:
 
 ```go
-package main
-
-import (
-    "time"
-
-    "go.mattglei.ch/timber"
-)
-
-func main() {
-    timber.Done("loaded up the program!")
-    time.Sleep(2 * time.Second)
-    timber.Done("waited 2 seconds")
-}
+sum := 2 + 2
+timber.Done("computed the sum of 2 and 2", timber.V("sum", sum))
 ```
 
 Outputs:
 
-![Done output](images/done.png)
+![done output](_images/done.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Donef()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.Donef("running for %d minutes", 21)
-```
+![done structured output](_images/done-structured.png)
 
 ### [`timber.Info()`](https://pkg.go.dev/go.mattglei.ch/timber#Info)
 
@@ -78,31 +90,16 @@ Output a info log.
 Demo:
 
 ```go
-package main
-
-import (
-    "time"
-
-    "go.mattglei.ch/timber"
-)
-
-func main() {
-    timber.Info("getting the current year")
-    now := time.Now()
-    timber.Info("current year is", now.Year())
-}
+timber.Info("server listening", timber.V("port", 8080))
 ```
 
 Outputs:
 
-![info output](images/info.png)
+![info output](_images/info.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Infof()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.Infof("I am %d years old", 21)
-```
+![info structured output](_images/info-structured.png)
 
 ### [`timber.Debug()`](https://pkg.go.dev/go.mattglei.ch/timber#Debug)
 
@@ -111,30 +108,17 @@ Output a debug log.
 Demo:
 
 ```go
-package main
-
-import (
-    "os"
-
-    "go.mattglei.ch/timber"
-)
-
-func main() {
-    homeDir, _ := os.UserHomeDir()
-    timber.Debug("user's home dir is", homeDir)
-}
+home, _ := os.UserHomeDir()
+timber.Debug("loaded home dir", timber.V("path", home))
 ```
 
 Outputs:
 
-![debug output](images/debug.png)
+![debug output](_images/debug.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Debugf()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.Debugf("The value of foo is %t", true)
-```
+![debug structured output](_images/debug-structured.png)
 
 ### [`timber.Warning()`](https://pkg.go.dev/go.mattglei.ch/timber#Warning)
 
@@ -143,32 +127,19 @@ Output a warning log.
 Demo:
 
 ```go
-package main
-
-import (
-    "time"
-
-    "go.mattglei.ch/timber"
-)
-
-func main() {
-    now := time.Now()
-    if now.Year() != 2004 {
-        timber.Warning("current year isn't 2004")
-    }
+year := time.Now().Year()
+if year != 2004 {
+  timber.Warning("it is not 2004")
 }
 ```
 
 Outputs:
 
-![warning output](images/warning.png)
+![warning output](_images/warning.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Warningf()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.Warningf("Responded with a HTTP status code of %d.", 404)
-```
+![warning structured output](_images/warning-structured.png)
 
 ### [`timber.Error()`](https://pkg.go.dev/go.mattglei.ch/timber#Error)
 
@@ -177,33 +148,20 @@ Output an error log with a stack trace.
 Demo:
 
 ```go
-package main
-
-import (
-    "os"
-
-    "go.mattglei.ch/timber"
-)
-
-func main() {
-    fname := "invisible-file.txt"
-    _, err := os.ReadFile(fName)
-    if err != nil {
-        timber.Error(err, "failed to read from", fname)
-    }
+filename := "foo.txt"
+_, err := os.ReadFile(filename)
+if err != nil {
+    timber.Error(err, "failed to read file", timber.V("filename", filename))
 }
 ```
 
 Outputs:
 
-![error output](images/error.png)
+![error output](_images/error.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Errorf()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.Errorf(err, "Failed to open file from the %s directory", "/usr/bin")
-```
+![error structured output](_images/error-structured.png)
 
 ### [`timber.ErrorMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#ErrorMsg)
 
@@ -212,25 +170,19 @@ Output an error message with a stack trace.
 Demo:
 
 ```go
-package main
-
-import "go.mattglei.ch/timber"
-
-func main() {
-    timber.ErrorMsg("error message")
+age := 21
+if age != 22 {
+    timber.ErrorMsg("user is not 22")
 }
 ```
 
 Outputs:
 
-![errorMsg output](images/errorMsg.png)
+![errorMsg output](_images/errorMsg.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.ErrorMsgf()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.ErrorMsgf("Failed to open file from the %s directory", "/usr/bin")
-```
+![errorMsg structured output](_images/errorMsg-structured.png)
 
 ### [`timber.Fatal()`](https://pkg.go.dev/go.mattglei.ch/timber#Fatal)
 
@@ -239,33 +191,19 @@ Output a fatal log with a stack trace.
 Demo:
 
 ```go
-package main
-
-import (
-    "os"
-
-    "go.mattglei.ch/timber"
-)
-
-func main() {
-    fName := "invisible-file.txt"
-    _, err := os.ReadFile(fName)
-    if err != nil {
-        timber.Fatal(err, "failed to read from", fName)
-    }
+_, err := net.Dial("tcp", "localhost:8080")
+if err != nil {
+    timber.Fatal(err, "failed to connect to server")
 }
 ```
 
 Outputs:
 
-![fatal output](images/fatal.png)
+![fatal output](_images/fatal.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.Fatalf()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.Fatalf(err, "Failed to delete %s from the system", "/usr/bin/timber")
-```
+![fatal structured output](_images/fatal-structured.png)
 
 ### [`timber.FatalMsg()`](https://pkg.go.dev/go.mattglei.ch/timber#FatalMsg)
 
@@ -274,46 +212,29 @@ Output a fatal message with a stack trace.
 Demo:
 
 ```go
-package main
-
-import "go.mattglei.ch/timber"
-
-func main() {
-    timber.FatalMsg("fatal message")
+if os.Getenv("API_KEY") == "" {
+    timber.FatalMsg("API_KEY environment variable is not set")
 }
 ```
 
 Outputs:
 
-![fatalMsg output](images/fatalMsg.png)
+![fatalMsg output](_images/fatalMsg.png)
 
-> [!NOTE]
-> Like all other logging functions there is a `log.Printf()` version of this function, which in this case would be `timber.FatalMsgf()`. Example:
+If [structured logging](#structured-logging) is enabled then it would output this instead:
 
-```go
-timber.FatalMsgf("Failed to delete %s from the system", "/usr/bin/timber")
-```
+![fatalMsg structured output](_images/fatalMsg-structured.png)
 
 ## Customization
 
 You can customize a number of different features of timber. Below is an example of some of this customization:
 
 ```go
-package main
+timber.Timezone(time.Local)
+timber.TimeFormat("Mon Jan 2 15:04:05 MST 2006")
+timber.FatalExitCode(0)
 
-import (
-    "time"
-
-    "go.mattglei.ch/timber"
-)
-
-func main() {
-    timber.Timezone(time.Local)
-    timber.TimeFormat("Mon Jan 2 15:04:05 MST 2006")
-    timber.FatalExitCode(0)
-
-    timber.Done("calling from custom logger")
-}
+timber.Done("calling from custom logger")
 ```
 
 Check the [godoc documentation](https://pkg.go.dev/go.mattglei.ch/timber) to see all the customization functions.

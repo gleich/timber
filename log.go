@@ -6,37 +6,37 @@ import (
 	"time"
 )
 
-func formatLog(level Level, msg string, start time.Time, attributes []Value) string {
+func formatLog(level Level, msg string, start time.Time, vals []Value) string {
 	if globalLogger.structured.enabled {
-		return formatStructured(level, msg, start, attributes)
+		return formatStructured(level, msg, start, vals)
 	}
-	return formatPlain(level, msg, start, attributes)
+	return formatPlain(level, msg, start, vals)
 }
 
-func formatStructured(level Level, msg string, start time.Time, attributes []Value) string {
+func formatStructured(level Level, msg string, start time.Time, vals []Value) string {
 	if !start.IsZero() {
-		attributes = append([]Value{{"duration", formatDuration(time.Since(start))}}, attributes...)
+		vals = append([]Value{{"duration", formatDuration(time.Since(start))}}, vals...)
 	}
-	out := make([]string, 0, 3+len(attributes))
+	out := make([]string, 0, 3+len(vals))
 	out = append(out,
 		time.Now().UTC().Format(globalLogger.structured.timeFormat),
 		fmt.Sprintf("level=%q", level.Message),
 		fmt.Sprintf("msg=%q", msg),
 	)
-	if len(attributes) > 0 {
-		fmtAttributes := make([]string, 0, len(attributes))
-		for _, attribute := range attributes {
-			fmtAttributes = append(
-				fmtAttributes,
+	if len(vals) > 0 {
+		fmtValues := make([]string, 0, len(vals))
+		for _, attribute := range vals {
+			fmtValues = append(
+				fmtValues,
 				fmt.Sprintf(`%s="%v"`, attribute.Key, attribute.Data),
 			)
 		}
-		out = append(out, strings.Join(fmtAttributes, " "))
+		out = append(out, strings.Join(fmtValues, " "))
 	}
 	return strings.Join(out, " ")
 }
 
-func formatPlain(level Level, msg string, start time.Time, attributes []Value) string {
+func formatPlain(level Level, msg string, start time.Time, vals []Value) string {
 	if !start.IsZero() {
 		msg = fmt.Sprintf("%s (%s)", msg, formatDuration(time.Since(start)))
 	}
@@ -46,15 +46,15 @@ func formatPlain(level Level, msg string, start time.Time, attributes []Value) s
 		level.renderedMsg,
 		msg,
 	)
-	if len(attributes) > 0 {
-		fmtAttributes := make([]string, 0, len(attributes))
-		for _, attribute := range attributes {
-			fmtAttributes = append(
-				fmtAttributes,
+	if len(vals) > 0 {
+		fmtValues := make([]string, 0, len(vals))
+		for _, attribute := range vals {
+			fmtValues = append(
+				fmtValues,
 				fmt.Sprintf("%s: %v", attribute.Key, attribute.Data),
 			)
 		}
-		out = append(out, "["+strings.Join(fmtAttributes, ", ")+"]")
+		out = append(out, "["+strings.Join(fmtValues, ", ")+"]")
 	}
 	return strings.Join(out, " ")
 }
@@ -63,12 +63,12 @@ func outputNormal(s string) {
 	globalLogger.normalOutput.logger.Print(s)
 }
 
-func logNormal(level Level, msg string, attributes []Value) {
-	outputNormal(formatLog(level, msg, time.Time{}, attributes))
+func logNormal(level Level, msg string, vals []Value) {
+	outputNormal(formatLog(level, msg, time.Time{}, vals))
 }
 
-func logDurationNormal(level Level, start time.Time, msg string, attributes []Value) {
-	outputNormal(formatLog(level, msg, start, attributes))
+func logDurationNormal(level Level, start time.Time, msg string, vals []Value) {
+	outputNormal(formatLog(level, msg, start, vals))
 }
 
 func outputError(
@@ -76,7 +76,7 @@ func outputError(
 	err error,
 	msg string,
 	start time.Time,
-	attributes []Value,
+	vals []Value,
 	outputStack bool,
 ) {
 	structured := globalLogger.structured.enabled
@@ -84,10 +84,10 @@ func outputError(
 	if err != nil {
 		errText = err.Error()
 		if structured {
-			attributes = append([]Value{{"error", errText}}, attributes...)
+			vals = append([]Value{{"error", errText}}, vals...)
 		}
 	}
-	out := formatLog(level, msg, start, attributes)
+	out := formatLog(level, msg, start, vals)
 	if err != nil && !structured {
 		out += "\n" + errText
 	}
@@ -101,10 +101,10 @@ func logError(
 	level Level,
 	err error,
 	msg string,
-	attributes []Value,
+	vals []Value,
 	outputStack bool,
 ) {
-	outputError(level, err, msg, time.Time{}, attributes, outputStack)
+	outputError(level, err, msg, time.Time{}, vals, outputStack)
 }
 
 func logDurationError(
@@ -112,8 +112,8 @@ func logDurationError(
 	err error,
 	start time.Time,
 	msg string,
-	attributes []Value,
+	vals []Value,
 	outputStack bool,
 ) {
-	outputError(level, err, msg, start, attributes, outputStack)
+	outputError(level, err, msg, start, vals, outputStack)
 }

@@ -9,6 +9,6 @@ import (
 func main() {
 	_, err := os.Stat("sample.txt")
 	if err != nil {
-		timber.Fatal(err)
+		timber.Fatal(err, "failed to read from file")
 	}
 }
