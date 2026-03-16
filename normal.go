@@ -3,85 +3,57 @@ package timber
 import "time"
 
 // Output a DEBUG-level message
-func Debug(v ...any) {
+func Debug(msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logNormal(globalLogger.levels.Debug, v...)
+	logNormal(globalLogger.levels.Debug, msg, attributes)
 }
 
 // Output a DEBUG-level message since a certain time
-func DebugSince(start time.Time, v ...any) {
+func DebugSince(start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationNormal(globalLogger.levels.Debug, start, v...)
-}
-
-// Output a formatted DEBUG-level message
-func Debugf(format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logFormatted(globalLogger.levels.Debug, format, v...)
+	logDurationNormal(globalLogger.levels.Debug, start, msg, attributes)
 }
 
 // Output a DONE-level message
-func Done(v ...any) {
+func Done(msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logNormal(globalLogger.levels.Done, v...)
+	logNormal(globalLogger.levels.Done, msg, attributes)
 }
 
 // Output a DONE-level message since a certain time
-func DoneSince(start time.Time, v ...any) {
+func DoneSince(start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationNormal(globalLogger.levels.Done, start, v...)
-}
-
-// Output a formatted DONE-level message
-func Donef(format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logFormatted(globalLogger.levels.Done, format, v...)
+	logDurationNormal(globalLogger.levels.Done, start, msg, attributes)
 }
 
 // Output a INFO-level message
-func Info(v ...any) {
+func Info(msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logNormal(globalLogger.levels.Info, v...)
+	logNormal(globalLogger.levels.Info, msg, attributes)
 }
 
 // Output a INFO-level message since a certain time
-func InfoSince(start time.Time, v ...any) {
+func InfoSince(start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationNormal(globalLogger.levels.Done, start, v...)
-}
-
-// Output a formatted INFO-level message
-func Infof(format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logFormatted(globalLogger.levels.Info, format, v...)
+	logDurationNormal(globalLogger.levels.Done, start, msg, attributes)
 }
 
 // Output a WARN-level message
-func Warning(v ...any) {
+func Warning(msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logNormal(globalLogger.levels.Warning, v...)
+	logNormal(globalLogger.levels.Warning, msg, attributes)
 }
 
 // Output a WARNING-level message since a certain time
-func WarningSince(start time.Time, v ...any) {
+func WarningSince(start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationNormal(globalLogger.levels.Done, start, v...)
-}
-
-// Output a formatted WARN-level message
-func Warningf(format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logFormatted(globalLogger.levels.Warning, format, v...)
+	logDurationNormal(globalLogger.levels.Done, start, msg, attributes)
 }

@@ -6,6 +6,15 @@ import (
 	"time"
 )
 
+func insertDuration(msg *string, attributes *[]Value, start time.Time) {
+	dur := formatDuration(time.Since(start))
+	if globalLogger.structured.enabled {
+		*attributes = append([]Value{{"duration", dur}}, *attributes...)
+	} else {
+		*msg = fmt.Sprintf("%s (%s)", *msg, dur)
+	}
+}
+
 func formatDuration(d time.Duration) string {
 	if d == 0 {
 		return "0s"
@@ -23,14 +32,14 @@ func formatDuration(d time.Duration) string {
 			if ms == 0 && d > 0 {
 				ms = 1
 			}
-			return fmt.Sprintf("(%s%dms)", sign, ms)
+			return fmt.Sprintf("%s%dms", sign, ms)
 		}
 
 		us := d.Microseconds()
 		if us == 0 && d > 0 {
 			us = 1
 		}
-		return fmt.Sprintf("(%s%dµs)", sign, us)
+		return fmt.Sprintf("%s%dµs", sign, us)
 	}
 
 	var parts []string
@@ -53,5 +62,5 @@ func formatDuration(d time.Duration) string {
 	sec := float64(d) / float64(time.Second)
 	parts = append(parts, fmt.Sprintf("%.1fs", sec))
 
-	return fmt.Sprintf("(%s%s)", sign, strings.Join(parts, " "))
+	return fmt.Sprintf("%s%s", sign, strings.Join(parts, " "))
 }

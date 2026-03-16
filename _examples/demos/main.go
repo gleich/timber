@@ -18,11 +18,11 @@ func main() {
 		func() {
 			timber.Info("getting the current year")
 			now := time.Now()
-			timber.Info("current year is", now.Year())
+			timber.Info("got current year", timber.Value{"year", now.Year()})
 		},
 		func() {
 			homeDir, _ := os.UserHomeDir()
-			timber.Debug("user's home dir is", homeDir)
+			timber.Debug("loaded home dir", timber.Value{"path", homeDir})
 		},
 		func() {
 			now := time.Now()
@@ -37,7 +37,7 @@ func main() {
 			fname := "invisible-file.txt"
 			_, err := os.ReadFile(fname)
 			if err != nil {
-				timber.Error(err, "failed to read from", fname)
+				timber.Error(err, "failed to read file", timber.Value{"filename", fname})
 			}
 		},
 		// func() {
@@ -47,7 +47,7 @@ func main() {
 			fname := "invisible-file.txt"
 			_, err := os.ReadFile(fname)
 			if err != nil {
-				timber.Fatal(err, "failed to read from", fname)
+				timber.Fatal(err, "failed to read file", timber.Value{"filename", fname})
 			}
 		},
 	}

@@ -6,89 +6,87 @@ import (
 )
 
 // Output an ERROR-level message with information about the error
-func Error(err error, v ...any) {
+func Error(err error, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logError(err, globalLogger.levels.Error, globalLogger.showErrorStack, false, v...)
+	logError(globalLogger.levels.Error, err, msg, attributes, globalLogger.showErrorStack)
 }
 
 // Output an ERROR-level message since a certain time with information about the error
-func ErrorSince(err error, start time.Time, v ...any) {
+func ErrorSince(err error, start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationError(err, globalLogger.levels.Error, globalLogger.showErrorStack, start, v...)
-}
-
-// Output a formatted ERROR-level message with information about the error
-func Errorf(err error, format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logErrorFormatted(err, globalLogger.levels.Error, globalLogger.showErrorStack, format, v...)
+	logDurationError(
+		globalLogger.levels.Error,
+		err,
+		start,
+		msg,
+		attributes,
+		globalLogger.showErrorStack,
+	)
 }
 
 // Output a ERROR-level message
-func ErrorMsg(v ...any) {
+func ErrorMsg(msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logError(nil, globalLogger.levels.Error, globalLogger.showErrorStack, false, v...)
+	logError(globalLogger.levels.Error, nil, msg, attributes, globalLogger.showErrorStack)
 }
 
 // Output an ERROR-level message since a certain time
-func ErrorMsgSince(start time.Time, v ...any) {
+func ErrorMsgSince(start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationError(nil, globalLogger.levels.Error, globalLogger.showErrorStack, start, v...)
-}
-
-// Output a ERROR-level message
-func ErrorMsgf(format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logErrorFormatted(nil, globalLogger.levels.Error, globalLogger.showErrorStack, format, v...)
+	logDurationError(
+		globalLogger.levels.Error,
+		nil,
+		start,
+		msg,
+		attributes,
+		globalLogger.showErrorStack,
+	)
 }
 
 // Output a FATAL-level message with information about the error
-func Fatal(err error, v ...any) {
+func Fatal(err error, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logError(err, globalLogger.levels.Fatal, globalLogger.showFatalStack, false, v...)
+	logError(globalLogger.levels.Fatal, err, msg, attributes, globalLogger.showFatalStack)
 	os.Exit(globalLogger.fatalExitCode)
 }
 
 // Output an FATAL log message since a certain time with information about the error
-func FatalSince(err error, start time.Time, v ...any) {
+func FatalSince(err error, start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationError(err, globalLogger.levels.Fatal, globalLogger.showErrorStack, start, v...)
-}
-
-// Output a formatted FATAL-level message with information about the error
-func Fatalf(err error, format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logErrorFormatted(err, globalLogger.levels.Fatal, globalLogger.showFatalStack, format, v...)
-	os.Exit(globalLogger.fatalExitCode)
+	logDurationError(
+		globalLogger.levels.Fatal,
+		err,
+		start,
+		msg,
+		attributes,
+		globalLogger.showErrorStack,
+	)
 }
 
 // Output a FATAL-level message
-func FatalMsg(v ...any) {
+func FatalMsg(msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logError(nil, globalLogger.levels.Fatal, globalLogger.showFatalStack, false, v...)
+	logError(globalLogger.levels.Fatal, nil, msg, attributes, globalLogger.showFatalStack)
 	os.Exit(globalLogger.fatalExitCode)
 }
 
 // Output an FATAL-level message since a certain time
-func FatalMsgSince(err error, start time.Time, v ...any) {
+func FatalMsgSince(err error, start time.Time, msg string, attributes ...Value) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationError(err, globalLogger.levels.Fatal, globalLogger.showErrorStack, start, v...)
-}
-
-// Output a formatted FATAL-level message
-func FatalMsgf(format string, v ...any) {
-	globalLogger.mutex.RLock()
-	defer globalLogger.mutex.RUnlock()
-	logErrorFormatted(nil, globalLogger.levels.Fatal, globalLogger.showFatalStack, format, v...)
-	os.Exit(globalLogger.fatalExitCode)
+	logDurationError(
+		globalLogger.levels.Fatal,
+		err,
+		start,
+		msg,
+		attributes,
+		globalLogger.showErrorStack,
+	)
 }
