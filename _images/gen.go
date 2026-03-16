@@ -17,14 +17,14 @@ func main() {
 	logs := map[string]func(){
 		"debug": func() {
 			home, _ := os.UserHomeDir()
-			timber.Debug("loaded home dir", timber.V("path", home))
+			timber.Debug("loaded home dir", timber.A("path", home))
 		},
 		"info": func() {
-			timber.Info("server listening", timber.V("port", 8080))
+			timber.Info("server listening", timber.A("port", 8080))
 		},
 		"done": func() {
 			sum := 2 + 2
-			timber.Done("computed the sum of 2 and 2", timber.V("sum", sum))
+			timber.Done("computed the sum of 2 and 2", timber.A("sum", sum))
 		},
 		"warning": func() {
 			year := time.Now().Year()
@@ -36,7 +36,7 @@ func main() {
 			filename := "foo.txt"
 			_, err := os.ReadFile(filename)
 			if err != nil {
-				timber.Error(err, "failed to read file", timber.V("filename", filename))
+				timber.Error(err, "failed to read file", timber.A("filename", filename))
 			}
 		},
 		"errorMsg": func() {
@@ -92,7 +92,7 @@ func generateImage(name string, structured bool) {
 		"--border.radius", "8",
 	).Run()
 	if err != nil {
-		timber.Fatal(err, "failed to generate image", timber.V("name", name))
+		timber.Fatal(err, "failed to generate image", timber.A("name", name))
 	}
 	timber.Done("generated " + filename)
 

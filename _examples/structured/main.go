@@ -7,5 +7,5 @@ import (
 func main() {
 	timber.Structured(true)
 
-	timber.Debug("hello world", timber.V("foo", "bar"))
+	timber.Debug("hello world", timber.A("foo", "bar"))
 }

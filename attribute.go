@@ -1,12 +1,12 @@
 package timber
 
-// Value is a key-value pair attached to a log entry for additional context.
-type Value struct {
-	Key  string
-	Data any
+// Attr is a key-value pair attached to a log entry for additional context.
+type Attr struct {
+	Key   string
+	Value any
 }
 
-// V creates a new Attr with the given key and value.
-func V(key string, value any) Value {
-	return Value{Key: key, Data: value}
+// A creates a new Attr with the given key and value.
+func A(key string, value any) Attr {
+	return Attr{Key: key, Value: value}
 }

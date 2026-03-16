@@ -41,21 +41,21 @@ By default, timber outputs human-readable plain logs. To enable structured (key=
 timber.Structured(true)
 ```
 
-You can attach additional context to any log call using `timber.Value`:
+You can attach additional context to any log call using `timber.Attr`:
 
 ```go
 timber.Info("user signed in",
-	timber.Value{Key: "user_id", Data: 42},
-	timber.Value{Key: "method", Data: "oauth"}
+	timber.Attr{Key: "user_id", Value: 42},
+	timber.Attr{Key: "method", Value: "oauth"}
 )
 ```
 
-For brevity, use the `timber.V` shorthand:
+For brevity, use the `timber.A` shorthand:
 
 ```go
 timber.Info("user signed in",
-	timber.V("user_id", 42),
-	timber.V("method", "oauth")
+	timber.A("user_id", 42),
+	timber.A("method", "oauth")
 )
 ```
 
@@ -71,7 +71,7 @@ Demo:
 
 ```go
 sum := 2 + 2
-timber.Done("computed the sum of 2 and 2", timber.V("sum", sum))
+timber.Done("computed the sum of 2 and 2", timber.A("sum", sum))
 ```
 
 Outputs:
@@ -89,7 +89,7 @@ Output a info log.
 Demo:
 
 ```go
-timber.Info("server listening", timber.V("port", 8080))
+timber.Info("server listening", timber.A("port", 8080))
 ```
 
 Outputs:
@@ -108,7 +108,7 @@ Demo:
 
 ```go
 home, _ := os.UserHomeDir()
-timber.Debug("loaded home dir", timber.V("path", home))
+timber.Debug("loaded home dir", timber.A("path", home))
 ```
 
 Outputs:
@@ -150,7 +150,7 @@ Demo:
 filename := "foo.txt"
 _, err := os.ReadFile(filename)
 if err != nil {
-    timber.Error(err, "failed to read file", timber.V("filename", filename))
+    timber.Error(err, "failed to read file", timber.A("filename", filename))
 }
 ```
 
