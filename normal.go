@@ -41,7 +41,7 @@ func Info(msg string, attrs ...Attr) {
 func InfoSince(start time.Time, msg string, attrs ...Attr) {
 	globalLogger.mutex.RLock()
 	defer globalLogger.mutex.RUnlock()
-	logDurationNormal(globalLogger.levels.Done, start, msg, attrs)
+	logDurationNormal(globalLogger.levels.Info, start, msg, attrs)
 }
 
 // Output a WARN-level message
