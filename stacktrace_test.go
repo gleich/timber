@@ -89,7 +89,7 @@ func TestFramesFromCall_Stress_Concurrent(t *testing.T) {
 					}()
 
 					for _, f := range frames {
-						if !(strings.HasSuffix(f.function, "()") || strings.Contains(f.function, "in goroutine")) {
+						if !strings.HasSuffix(f.function, "()") && !strings.Contains(f.function, "in goroutine") {
 							errCh <- "function not normalized: " + f.function
 							return
 						}
@@ -101,7 +101,7 @@ func TestFramesFromCall_Stress_Concurrent(t *testing.T) {
 							errCh <- "path still contains +0x: " + f.path
 							return
 						}
-						if !(strings.Contains(f.path, ".go:") || f.path == "") {
+						if !strings.Contains(f.path, ".go:") && f.path != "" {
 							errCh <- "path does not look like go file: " + f.path
 							return
 						}
