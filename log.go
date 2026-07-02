@@ -6,114 +6,76 @@ import (
 	"time"
 )
 
-func formatLog(level Level, msg string, start time.Time, attrs []Attr) string {
-	if globalLogger.structured.enabled {
-		return formatStructured(level, msg, start, attrs)
+func formatLog(level Level, v ...any) *strings.Builder {
+	var out strings.Builder
+	if globalLogger.displayTime {
+		out.WriteString(time.Now().In(globalLogger.timezone).Format(globalLogger.timeFormat))
+		out.WriteRune(' ')
 	}
-	return formatPlain(level, msg, start, attrs)
-}
+	out.WriteString(level.renderedMsg)
+	out.WriteRune(' ')
 
-func formatStructured(level Level, msg string, start time.Time, attrs []Attr) string {
-	if !start.IsZero() {
-		attrs = append([]Attr{{"duration", formatDuration(time.Since(start))}}, attrs...)
-	}
-	out := make([]string, 0, 3+len(attrs))
-	out = append(out,
-		time.Now().UTC().Format(globalLogger.structured.timeFormat),
-		fmt.Sprintf("level=%q", level.Message),
-		fmt.Sprintf("msg=%q", msg),
-	)
-	if len(attrs) > 0 {
-		fmtValues := make([]string, 0, len(attrs))
-		for _, attribute := range attrs {
-			fmtValues = append(
-				fmtValues,
-				fmt.Sprintf(`%s="%v"`, attribute.Key, attribute.Value),
-			)
+	for i, item := range v {
+		if i > 0 {
+			out.WriteRune(' ')
 		}
-		out = append(out, strings.Join(fmtValues, " "))
+		fmt.Fprint(&out, item)
 	}
-	return strings.Join(out, " ")
+	return &out
 }
 
-func formatPlain(level Level, msg string, start time.Time, attrs []Attr) string {
-	if !start.IsZero() {
-		msg = fmt.Sprintf("%s (%s)", msg, formatDuration(time.Since(start)))
-	}
-	out := make([]string, 0, 3)
-	out = append(out,
-		time.Now().In(globalLogger.timezone).Format(globalLogger.timeFormat),
-		level.renderedMsg,
-		msg,
+func logNormal(level Level, v ...any) {
+	globalLogger.normalOutput.logger.Print(formatLog(level, v...).String())
+}
+
+func logFormatted(level Level, format string, v ...any) {
+	logNormal(level, fmt.Sprintf(format, v...))
+}
+
+func logDurationNormal(level Level, start time.Time, v ...any) {
+	logNormal(
+		level,
+		append(v, globalLogger.durationFormatter(time.Since(start)))...,
 	)
-	if len(attrs) > 0 {
-		fmtValues := make([]string, 0, len(attrs))
-		for _, attribute := range attrs {
-			fmtValues = append(
-				fmtValues,
-				fmt.Sprintf("%s: %v", attribute.Key, attribute.Value),
-			)
-		}
-		out = append(out, "["+strings.Join(fmtValues, ", ")+"]")
-	}
-	return strings.Join(out, " ")
 }
 
-func outputNormal(s string) {
-	globalLogger.normalOutput.logger.Print(s)
-}
-
-func logNormal(level Level, msg string, attrs []Attr) {
-	outputNormal(formatLog(level, msg, time.Time{}, attrs))
-}
-
-func logDurationNormal(level Level, start time.Time, msg string, attrs []Attr) {
-	outputNormal(formatLog(level, msg, start, attrs))
-}
-
-func outputError(
-	level Level,
-	err error,
-	msg string,
-	start time.Time,
-	vals []Attr,
-	outputStack bool,
-) {
-	structured := globalLogger.structured.enabled
-	var errText string
+func logError(err error, level Level, outputStack bool, formatted bool, v ...any) {
+	var errorText string
 	if err != nil {
-		errText = err.Error()
-		if structured {
-			vals = append([]Attr{{"error", errText}}, vals...)
+		errorText = err.Error()
+	}
+	var out *strings.Builder
+	if len(v) == 0 {
+		out = formatLog(level, errorText)
+	} else {
+		out = formatLog(level, v...)
+		if err != nil {
+			out.WriteRune('\n')
+			out.WriteString(err.Error())
 		}
 	}
-	out := formatLog(level, msg, start, vals)
-	if err != nil && !structured {
-		out += "\n" + errText
-	}
+
 	if outputStack {
-		stackTrace(&out, 5)
+		out.WriteRune('\n')
+		callHeight := 4
+		if formatted {
+			callHeight++
+		}
+		stackTrace(out, callHeight)
 	}
-	globalLogger.errOutput.logger.Print(out)
+	globalLogger.errOutput.logger.Print(out.String())
 }
 
-func logError(
-	level Level,
-	err error,
-	msg string,
-	attrs []Attr,
-	outputStack bool,
-) {
-	outputError(level, err, msg, time.Time{}, attrs, outputStack)
+func logDurationError(err error, level Level, outputStack bool, start time.Time, v ...any) {
+	logError(
+		err,
+		level,
+		outputStack,
+		false,
+		append(v, globalLogger.durationFormatter(time.Since(start)))...,
+	)
 }
 
-func logDurationError(
-	level Level,
-	err error,
-	start time.Time,
-	msg string,
-	attrs []Attr,
-	outputStack bool,
-) {
-	outputError(level, err, msg, start, attrs, outputStack)
+func logErrorFormatted(err error, level Level, outputStack bool, format string, v ...any) {
+	logError(err, level, outputStack, true, fmt.Sprintf(format, v...))
 }

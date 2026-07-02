@@ -25,18 +25,12 @@ type logger struct {
 	timezone          *time.Location
 	levels            Levels
 	stackPathStyle    lipgloss.Style
-	structured        structuredOptions
 }
 
 type output struct {
 	logger   *log.Logger
 	renderer *lipgloss.Renderer
 	writer   io.Writer
-}
-
-type structuredOptions struct {
-	enabled    bool
-	timeFormat string
 }
 
 func init() {
@@ -67,10 +61,6 @@ func init() {
 			timezone:          time.UTC,
 			displayTime:       true,
 			durationFormatter: formatDuration,
-			structured: structuredOptions{
-				enabled:    false,
-				timeFormat: time.RFC3339,
-			},
 			levels: Levels{
 				Debug: Level{
 					Message: "DEBUG",
@@ -79,17 +69,17 @@ func init() {
 						Foreground(lipgloss.Color("#2B95FF")),
 				},
 				Info: Level{
-					Message: "INFO",
+					Message: "INFO ",
 					Style:   bold,
 				},
 				Done: Level{
-					Message: "DONE",
+					Message: "DONE ",
 					Style: renderer.NewStyle().
 						Inherit(bold).
 						Foreground(lipgloss.Color("#30CE75")),
 				},
 				Warning: Level{
-					Message: "WARN",
+					Message: "WARN ",
 					Style: renderer.NewStyle().
 						Inherit(bold).
 						Foreground(lipgloss.Color("#E1DC3F")),
@@ -199,13 +189,4 @@ func Timezone(loc *time.Location) {
 	globalLogger.mutex.Lock()
 	defer globalLogger.mutex.Unlock()
 	globalLogger.timezone = loc
-}
-
-// Set if the logs should be structured
-//
-// Default is false
-func Structured(enabled bool) {
-	globalLogger.mutex.Lock()
-	defer globalLogger.mutex.Unlock()
-	globalLogger.structured.enabled = enabled
 }
